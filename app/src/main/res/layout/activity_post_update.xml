@@ -1,15 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomestayPost.FormActivity">
+    tools:context=".HomestayPost.PostUpdateActivity">
 
     <include
-    android:id="@+id/find_toolbar"
-    layout="@layout/app_bar_layout">
-</include>
+        android:id="@+id/find_toolbar"
+        layout="@layout/app_bar_layout">
+    </include>
 
     <ScrollView
         android:layout_width="fill_parent"
@@ -55,7 +56,6 @@
                         android:background="@drawable/ic_add_a_photo_black_24dp"/>
 
                     <ImageView
-                        android:id="@+id/imgView1"
                         android:layout_width="50dp"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
@@ -64,7 +64,6 @@
                         android:background="@drawable/ic_add_a_photo_black_24dp"/>
 
                     <ImageView
-                        android:id="@+id/imgView2"
                         android:layout_width="50dp"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
@@ -73,7 +72,6 @@
                         android:background="@drawable/ic_add_a_photo_black_24dp"/>
 
                     <ImageView
-                        android:id="@+id/imgView3"
                         android:layout_width="50dp"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
@@ -81,13 +79,13 @@
                         android:padding="10dp"
                         android:background="@drawable/ic_add_a_photo_black_24dp"/>
 
-<!--                    <ImageView
+                    <ImageView
                         android:layout_width="50dp"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:layout_margin="20dp"
                         android:padding="10dp"
-                        android:background="@drawable/ic_add_a_photo_black_24dp"/>-->
+                        android:background="@drawable/ic_add_a_photo_black_24dp"/>
                 </LinearLayout>
             </HorizontalScrollView>
 
@@ -120,27 +118,27 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-<!--                    <LinearLayout
-                        android:id="@+id/R11"
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:orientation="vertical">
+                <!--                    <LinearLayout
+                                        android:id="@+id/R11"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="200dp"
+                                        android:orientation="vertical">
 
-                        <TextView
-                            android:id="@+id/tvImage1"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Pictures" />
+                                        <TextView
+                                            android:id="@+id/tvImage1"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:text="Pictures" />
 
-                        <ImageView
-                            android:id="@+id/imgView2"
-                            android:layout_width="150dp"
-                            android:layout_height="150dp"
-                            android:layout_gravity="center"
-                            android:adjustViewBounds="true"
-                            android:background="@drawable/ic_add_a_photo_black_24dp"
-                            android:scaleType="center" />
-                    </LinearLayout>-->
+                                        <ImageView
+                                            android:id="@+id/imgView2"
+                                            android:layout_width="150dp"
+                                            android:layout_height="150dp"
+                                            android:layout_gravity="center"
+                                            android:adjustViewBounds="true"
+                                            android:background="@drawable/ic_add_a_photo_black_24dp"
+                                            android:scaleType="center" />
+                                    </LinearLayout>-->
 
                 <TextView
                     android:id="@+id/tvDetails"
@@ -229,26 +227,22 @@
                             <CheckBox android:id="@+id/cbAircond"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/ac"
-                                android:onClick="onCheckboxClicked"/>
+                                android:text="@string/ac" />
 
                             <CheckBox android:id="@+id/cbCooking"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/cooking"
-                                android:onClick="onCheckboxClicked"/>
+                                android:text="@string/cooking" />
 
                             <CheckBox android:id="@+id/cbInternet"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/internet"
-                                android:onClick="onCheckboxClicked"/>
+                                android:text="@string/internet" />
 
                             <CheckBox android:id="@+id/cbWashingMachine"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/wm"
-                                android:onClick="onCheckboxClicked"/>
+                                android:text="@string/wm" />
 
                         </LinearLayout>
 
@@ -331,23 +325,15 @@
                         <!--testing lat lang-->
 
                         <android.support.v7.widget.AppCompatButton
-                            android:id="@+id/btnSubmit"
+                            android:id="@+id/btnUpdate"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:layout_margin="7dp"
                             android:background="@drawable/btn_rounded"
-                            android:text="Submit"
+                            android:text="Update"
                             android:textAllCaps="false"
                             android:textColor="@color/white" />
-
-                        <TextView
-                            android:id="@+id/tvUploads"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="View Upload Images"
-                            android:textSize="20sp"/>
                     </LinearLayout>
 
                     <ProgressBar
@@ -361,4 +347,5 @@
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
+
 </RelativeLayout>

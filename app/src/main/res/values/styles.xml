@@ -5,7 +5,7 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/cloudshadow</item>
         <item name="colorPrimaryDark">@color/crevice</item>
-        <item name="colorAccent">@color/greenery</item>
+        <item name="colorAccent">@color/desert</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -26,6 +26,10 @@
 
     <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">18sp</item>
+    </style>
+
+    <!-- ToolBar Custom Main Activity -->
+    <style name="Toolbar.CustomMain" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
     </style>
 
 </resources>

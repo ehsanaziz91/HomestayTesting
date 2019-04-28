@@ -1,4 +1,5 @@
-package com.example.homestaytesting;
+package com.example.homestaytesting.HomestayPost.MVC;
+
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -9,13 +10,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.homestaytesting.Modal.Upload;
+import com.example.homestaytesting.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
     private Context Context;
-    private List<Upload> Upload;
+    private List<com.example.homestaytesting.Modal.Upload> Upload;
 
     public ImageAdapter(Context context, List<Upload> uploads){
         Context = context;
@@ -32,11 +35,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     @Override
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
         Upload uploadCurrent = Upload.get(position);
-        holder.textViewName.setText(uploadCurrent.getImgName());
-        holder.textViewDetails.setText(uploadCurrent.getImgDetails());
-        holder.textViewLocation.setText(uploadCurrent.getImgLocation());
-        holder.textViewDetails.setText(uploadCurrent.getImgDetails());
-        holder.textViewDetails.setText(uploadCurrent.getImgDetails());
+        holder.textViewName.setText(uploadCurrent.getHmName());
+        holder.textViewDetails.setText(uploadCurrent.getHmDetails());
+        holder.textViewLocation.setText(uploadCurrent.getHmLocation());
+        holder.textViewPrice.setText(uploadCurrent.getHmPrice());
+        holder.textViewContact.setText(uploadCurrent.getHmContact());
         Picasso.with(Context)
                 .load(uploadCurrent.getImgUrl())
                 .fit()
@@ -60,11 +63,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         public ImageViewHolder(View itemView){
             super(itemView);
 
-            textViewContact = itemView.findViewById(R.id.textViewContact);
-            textViewPrice = itemView.findViewById(R.id.textViewPrice);
-            textViewLocation = itemView.findViewById(R.id.textViewLocation);
-            textViewDetails = itemView.findViewById(R.id.textViewDetails);
-            textViewName = itemView.findViewById(R.id.textViewName);
+            textViewContact = itemView.findViewById(R.id.tvContact);
+            textViewPrice = itemView.findViewById(R.id.tvPrice);
+            textViewLocation = itemView.findViewById(R.id.tvLocation);
+            textViewDetails = itemView.findViewById(R.id.tvDetails);
+            textViewName = itemView.findViewById(R.id.tvName);
             imageView = itemView.findViewById(R.id.imgView);
         }
     }

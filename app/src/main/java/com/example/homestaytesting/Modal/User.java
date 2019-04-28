@@ -1,13 +1,13 @@
-package com.example.homestaytesting;
+package com.example.homestaytesting.Modal;
 
 public class User {
-    public String name;
-    public String email;
-    public String phone;
-    public String role;
-    public String profileimage2;
-    public String profiledescription;
-    public String devicetoken;
+    private String name;
+    private String email;
+    private String phone;
+    private String role;
+    private String profileimage2;
+    private String profiledescription;
+    private String devicetoken;
 
 
     public User()

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".LoginActivity">
+    tools:context=".SignupActivity">
 
     <include
         android:id="@+id/find_toolbar"
@@ -15,10 +15,8 @@
     <RelativeLayout
         android:id="@+id/R1"
         android:layout_width="match_parent"
-        android:layout_height="30sp"
-        android:layout_weight="1"
-        android:background="@color/white">
-
+        android:layout_height="42sp"
+        android:layout_weight="1" >
 
         <ImageView
             android:id="@+id/loginlogo"
@@ -31,21 +29,31 @@
 
     </RelativeLayout>
 
-
     <RelativeLayout
-        android:id="@+id/R2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.5"
-        android:background="@color/white">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp"
+            android:padding="@dimen/default_padding"
             android:orientation="vertical">
+
+            <!-- Full Name Label -->
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/edit_text_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="@dimen/drawable_padding"
+                    android:drawableLeft="@drawable/ic_name"
+                    android:hint="@string/full_name"
+                    android:nextFocusDown="@id/edit_text_email"/>
+            </android.support.design.widget.TextInputLayout>
 
             <!-- Email Label -->
             <android.support.design.widget.TextInputLayout
@@ -53,24 +61,25 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/editTextEmail"
+                    android:id="@+id/edit_text_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="3dp"
                     android:drawablePadding="@dimen/drawable_padding"
                     android:drawableLeft="@drawable/ic_email"
                     android:inputType="textEmailAddress"
                     android:hint="@string/email"
-                    android:nextFocusDown="@id/editTextPassword"/>
+                    android:nextFocusDown="@id/edit_text_password"/>
             </android.support.design.widget.TextInputLayout>
 
             <!-- Password Label -->
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+                <!--app:passwordToggleEnabled="true"
+                app:passwordToggleTint="@color/black"-->
 
                 <EditText
-                    android:id="@+id/editTextPassword"
+                    android:id="@+id/edit_text_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawablePadding="@dimen/drawable_padding"
@@ -80,39 +89,66 @@
                     android:nextFocusDown="@id/edit_text_phone"/>
             </android.support.design.widget.TextInputLayout>
 
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/buttonLogin"
+            <!-- Contact Label -->
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/edit_text_phone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="@dimen/drawable_padding"
+                    android:drawableLeft="@drawable/ic_phone"
+                    android:inputType="number"
+                    android:digits="0123456789"
+                    android:maxLength="10"
+                    android:hint="@string/phone"
+                    android:nextFocusDown="@id/button_register"/>
+            </android.support.design.widget.TextInputLayout>
+
+            <RadioGroup
+                android:id="@+id/registerRoleRadioGroup"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:gravity="center"
+                android:orientation="horizontal">>
+
+                <RadioButton
+                    android:id="@+id/radioButton_agent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="60dp"
+                    android:layout_weight="1"
+                    android:text="Owner" />
+
+                <RadioButton
+                    android:id="@+id/radioButton_customer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Guest" />
+            </RadioGroup>
+
+            <Button
+                android:id="@+id/button_register"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="7dp"
                 android:background="@drawable/btn_rounded"
-                android:text="Login"
+                android:text="@string/register"
                 android:textAllCaps="false"
                 android:textColor="@color/white" />
 
             <TextView
-                android:id="@+id/textViewSignup"
+                android:id="@+id/tvSignIn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="onClick"
                 android:padding="15dp"
-                android:text="Don't have account ? Sign Up"
+                android:text="Already have account ? Sign In"
                 android:textAlignment="center"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
                 android:textColor="@color/black" />
-
-            <TextView
-                android:id="@+id/textResetPass"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:onClick="onClick"
-                android:padding="15dp"
-                android:text="Forgot Password ?"
-                android:textAlignment="center"
-                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
-                android:textColor="@color/black" />
-
         </LinearLayout>
 
         <ProgressBar
@@ -121,8 +157,6 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:visibility="gone" />
-
+            android:visibility="gone"/>
     </RelativeLayout>
-
 </LinearLayout>

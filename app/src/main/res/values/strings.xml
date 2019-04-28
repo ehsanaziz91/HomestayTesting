@@ -6,6 +6,7 @@
     <string name="nav_header_subtitle">ehsanaziz96@gmail.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+    <string name="action_logout">Logout</string>
     <string name="title_activity_maps">Map</string>
 
     <!-- TODO: Remove or change this placeholder text -->
@@ -15,7 +16,7 @@
     <string name="full_name">Full Name</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
-    <string name="phone">Phone</string>
+    <string name="phone">Contact No.</string>
     <string name="register">Registration</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password (optional)</string>
@@ -33,4 +34,50 @@
     <string name="title_list">Listing</string>
     <string name="auth_failed">Authenticating Failed</string>
     <string name="minimum_password">Minimum Password</string>
+
+    <string name="fully">Fully Furnished</string>
+    <string name="partially">Partially Furnished</string>
+
+    <string name="ac">Aircond</string>
+    <string name="cooking">Cooking Allowed</string>
+    <string name="internet">Internet</string>
+    <string name="wm">Washing Machine</string>
+
+    <string name="propertyTitle">Choose a property category</string>
+    <string-array name="propertyCat">
+        <item>Select Property Category</item>
+        <item>Bungalow / Villa</item>
+        <item>Double Storey</item>
+        <item>Single Storey</item>
+        <item>Semi-D</item>
+    </string-array>
+
+    <string name="bedroomsTitle">Choose a number badrooms</string>
+    <string-array name="bedroomsCat">
+        <item>Select Bedrooms</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+    </string-array>
+
+    <string name="bathroomTitle">Choose a number bathrooms</string>
+    <string-array name="bathroomCat">
+        <item>Select Bathroom</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+    </string-array>
+
 </resources>

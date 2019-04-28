@@ -2,13 +2,11 @@ package com.example.homestaytesting;
 
 //import android.app.FragmentManager;
 import android.content.Intent;
-import android.support.v4.app.Fragment;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -17,7 +15,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.FrameLayout;
 
+import com.example.homestaytesting.BottomNavigation.BottomNavigationActivity;
+import com.example.homestaytesting.BottomNavigation.ListingFragment;
+import com.example.homestaytesting.BottomNavigation.MapsFragment;
+import com.example.homestaytesting.HomestayPost.FormActivity;
+import com.example.homestaytesting.HomestayPost.PostListingActivity;
+import com.example.homestaytesting.HomestayPost.PostUpdateActivity;
+import com.example.homestaytesting.Modal.User;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -26,17 +33,39 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback {
+        implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback{
 
     private GoogleMap mMap;
+    FirebaseAuth hmAuth;
+    FirebaseUser firebaseUser;
+
+    private DatabaseReference UsersRef,Postsref,LikesRef;
+
+    private String currentUserid;
+
+    NavigationView navigationView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        hmAuth = FirebaseAuth.getInstance();
+        currentUserid = hmAuth.getCurrentUser().getUid();
+        UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
+
+        //DetermineRole();
 
 /*        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -60,13 +89,65 @@ public class MainActivity extends AppCompatActivity
             navigationView.setCheckedItem(R.id.map1);
         }*/
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById(R.id.maps);
         mapFragment.getMapAsync(this);
+
+        //Button Hide Visible
+/*        Menu menuNav= navigationView.getMenu();
+        MenuItem nav_item2 = menuNav.findItem(R.id.nav_slideshow);
+        nav_item2.setVisible(false);*/
+
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+
+
+        dbRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+            {
+                if(!dataSnapshot.exists())
+                {
+                    final FirebaseUser user = hmAuth.getCurrentUser();
+                    final String uid = user.getUid();
+
+                    User usersData = dataSnapshot.child("Users").child(uid).getValue(User.class);
+
+                    if(usersData.getRole().equals("Guest"))
+                    {
+                        Menu menuNav= navigationView.getMenu();
+                        MenuItem nav_item2 = menuNav.findItem(R.id.nav_slideshow);
+                        nav_item2.setVisible(true);
+                    }
+                    else if(usersData.getRole().equals("Owner"))
+                    {
+                        Menu menuNav= navigationView.getMenu();
+                        MenuItem nav_item2 = menuNav.findItem(R.id.nav_slideshow);
+                        nav_item2.setVisible(true);
+                    }
+                    else if(usersData.getRole().equals("Admin"))
+                    {
+                        Menu menuNav= navigationView.getMenu();
+                        MenuItem nav_item2 = menuNav.findItem(R.id.nav_slideshow);
+                        nav_item2.setVisible(true);
+                    }
+                    else {
+                        Menu menuNav= navigationView.getMenu();
+                        MenuItem nav_item2 = menuNav.findItem(R.id.nav_slideshow);
+                        nav_item2.setVisible(true);
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -107,9 +188,14 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+        if (id == R.id.nav_home) {
+            Intent intent = new Intent(MainActivity.this, UserProfileActivity.class);
             startActivity(intent);
+
+        }else if (id == R.id.nav_camera) {
+            Intent intent = new Intent(MainActivity.this, MapActivity.class);
+            startActivity(intent);
+
         } else if (id == R.id.nav_gallery) {
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
@@ -119,28 +205,30 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
 
         } else if (id == R.id.nav_manage) {
-            Intent intent = new Intent(MainActivity.this, Testadd2.class);
+/*            Intent intent = new Intent(MainActivity.this, Testadd2.class);
+            startActivity(intent);*/
+
+        }else if (id == R.id.nav_profile) {
+            Intent intent = new Intent(MainActivity.this, ToolbarTestingActivity.class);
             startActivity(intent);
 
-        } else if (id == R.id.nav_share) {
+        }else if (id == R.id.nav_viewAds) {
+            Intent intent = new Intent(MainActivity.this, PostUpdateActivity.class);
+            startActivity(intent);
 
-        } else if (id == R.id.nav_signin) {
+        }else if (id == R.id.nav_signup) {
 
 /*            SigninFragment signinFragment = new SigninFragment();
             FragmentManager manager = getSupportFragmentManager();
             //Fragment manager = getSupportFragmentManager();
             manager.beginTransaction().replace(R.id.mainLayout, signinFragment).commit();*/
 
-            Intent intent = new Intent(MainActivity.this, SigninActivity.class);
-            startActivity(intent);
+/*            Intent intent = new Intent(MainActivity.this, SignupActivity.class);
+            startActivity(intent);*/
             //return true;
 
-        } else if (id == R.id.nav_contactus) {
-
-            ContactUsFragment contactUsFragment = new ContactUsFragment();
-            FragmentManager manager = getSupportFragmentManager();
-            //Fragment manager = getSupportFragmentManager();
-            manager.beginTransaction().replace(R.id.mainLayout, contactUsFragment).commit();
+        }else if (id == R.id.nav_logout) {
+            logout();
 
         }
 
@@ -154,7 +242,7 @@ public class MainActivity extends AppCompatActivity
         //mMap = googleMap;
 
         LatLng pp = new LatLng(2.2799557,102.2785741);
-        String markerText = "I'm here baby";
+        String markerText = "I'm here guys";
 /*        MarkerOptions options = new MarkerOptions();
         options.position(pp).title("Universiti Teknikal Malaysia Melaka");
         mMap.addMarker(new MarkerOptions().position(pp).title(markerText));
@@ -168,5 +256,16 @@ public class MainActivity extends AppCompatActivity
         //zoom to position with level 16
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(pp, 16);
         googleMap.animateCamera(cameraUpdate);
+    }
+
+    private void logout() {
+        hmAuth.signOut();
+        sendToLogin();
+    }
+
+    private void sendToLogin() {
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

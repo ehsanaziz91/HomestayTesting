@@ -8,13 +8,13 @@ import android.support.v7.widget.Toolbar;
 import android.util.Patterns;
 import android.view.View;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.example.homestaytesting.Modal.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -25,13 +25,14 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
-    FirebaseAuth mAuth;
+    private FirebaseAuth hmAuth;
     private DatabaseReference UserRef;
-    EditText editTextEmail, editTextPassword;
-    ProgressBar progressBar;
+    private EditText editTextEmail, editTextPassword;
+    private ProgressBar progressBar;
 
     private ImageView loginlogo;
     private static int SPLASH_TIME_OUT = 3000;
@@ -46,10 +47,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        mAuth = FirebaseAuth.getInstance();
+        hmAuth = FirebaseAuth.getInstance();
         UserRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
-        if(mAuth.getCurrentUser() !=null)
+        if(hmAuth.getCurrentUser() !=null)
         {
             DetermineRole();
         }
@@ -59,7 +60,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         progressBar = (ProgressBar) findViewById(R.id.progressbar);
 
         findViewById(R.id.textViewSignup).setOnClickListener(this);
-        findViewById(R.id.textResetPassword).setOnClickListener(this);
+        findViewById(R.id.textResetPass).setOnClickListener(this);
         findViewById(R.id.buttonLogin).setOnClickListener(this);
 
 /*        loginlogo = findViewById(R.id.loginlogo);
@@ -68,7 +69,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         mToolbar = (Toolbar) findViewById(R.id.find_toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle(" Sign In To Our System");
+        getSupportActionBar().setTitle("Sign In");
 
         R1 = (RelativeLayout) findViewById(R.id.R1);
         R2 = (RelativeLayout) findViewById(R.id.R2);
@@ -111,8 +112,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         progressBar.setVisibility(View.VISIBLE);
 
-
-        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(
+        hmAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(
             new OnCompleteListener<AuthResult>() {
 
                 @Override
@@ -140,14 +140,21 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public void DetermineRole(){
-        final FirebaseUser user = mAuth.getCurrentUser();
+        final FirebaseUser user = hmAuth.getCurrentUser();
         final String uid = user.getUid();
+        final String deviceToken = FirebaseInstanceId.getInstance().getToken();
 
+        //replace noti when tukar device
+        //UserRef.child(uid).child("devicetoken").setValue(deviceToken);
 
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference xx = db.getReference();
 
-        xx.addValueEventListener(new ValueEventListener() {
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+
+/*        xx.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot)
             {
@@ -155,7 +162,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 {
                     User usersData = dataSnapshot.child("Users").child(uid).getValue(User.class);
 
-                    if(usersData.getRole().equals("People"))
+                    if(usersData.getRole().equals("Guest"))
                     {
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
@@ -181,22 +188,22 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        });*/
 
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.textViewSignup:
-                startActivity(new Intent(this, SigninActivity.class));
-                break;
             case R.id.buttonLogin:
                 userLogin();
                 break;
-/*            case R.id.textResetPassword:
-                startActivity(new Intent(this, ResetPasswordActivity.class));
-                break;*/
+            case R.id.textViewSignup:
+                startActivity(new Intent(this, SignupActivity.class));
+                break;
+            case R.id.textResetPass:
+                startActivity(new Intent(this, ForgotPassActivity.class));
+                break;
         }
 
     }

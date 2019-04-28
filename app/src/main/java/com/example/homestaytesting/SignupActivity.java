@@ -14,25 +14,22 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.example.homestaytesting.Modal.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
-public class SigninActivity extends AppCompatActivity implements View.OnClickListener {
+public class SignupActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EditText editTextName, editTextEmail, editTextPassword, editTextPhone;
     private RadioGroup radioGroupRoles;
     private RadioButton radioButtonRolesoption;
     private ProgressBar progressBar;
 
-    private FirebaseAuth mAuth;
+    private FirebaseAuth hmAuth;
     private String role;
 
     private Toolbar mToolbar;
@@ -40,14 +37,20 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_signin);
+        setContentView(R.layout.activity_signup);
+
+        mToolbar = (Toolbar) findViewById(R.id.find_toolbar);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle("Sign Up");
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         editTextName = findViewById(R.id.edit_text_name);
         editTextEmail = findViewById(R.id.edit_text_email);
         editTextPassword = findViewById(R.id.edit_text_password);
         editTextPhone = findViewById(R.id.edit_text_phone);
         progressBar = findViewById(R.id.progressbar);
-        progressBar.setVisibility(View.GONE);
 
         radioGroupRoles = (RadioGroup) findViewById(R.id.registerRoleRadioGroup);
         radioGroupRoles.setOnCheckedChangeListener((new RadioGroup.OnCheckedChangeListener() {
@@ -70,16 +73,9 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
         int i = radioGroupRoles.getCheckedRadioButtonId();
         radioButtonRolesoption = (RadioButton) findViewById(i);
 
-        mAuth = FirebaseAuth.getInstance();
+        hmAuth = FirebaseAuth.getInstance();
 
         findViewById(R.id.button_register).setOnClickListener((View.OnClickListener) this);
-
-        mToolbar = (Toolbar) findViewById(R.id.find_toolbar);
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle(" Sign Up To Our System");
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
     @Override
@@ -95,7 +91,7 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
     protected void onStart() {
         super.onStart();
 
-        if (mAuth.getCurrentUser() != null) {
+        if (hmAuth.getCurrentUser() != null) {
             //handle the already login user
         }
     }
@@ -152,9 +148,9 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
             return;
         }
 
-
         progressBar.setVisibility(View.VISIBLE);
-        mAuth.createUserWithEmailAndPassword(email, password)
+
+        hmAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
@@ -173,7 +169,6 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
 
                         );
 
-
                         FirebaseDatabase.getInstance().getReference("Users")
                                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                 .setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -182,19 +177,18 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
 
                                 progressBar.setVisibility(View.GONE);
                                 if (task.isSuccessful()) {
-                                    Toast.makeText(com.example.homestaytesting.SigninActivity.this, getString(R.string.registration_success), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(SignupActivity.this, getString(R.string.registration_success), Toast.LENGTH_LONG).show();
                                     finish();
                                     SendUserToLoginActivity();
 
                                 } else {
                                     //display a failure message
                                 }
-
                             }
                         });
 
                     } else {
-                        Toast.makeText(com.example.homestaytesting.SigninActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(SignupActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }
                 }
             });
@@ -202,7 +196,7 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void SendUserToLoginActivity() {
-        Intent mainIntent = new Intent(com.example.homestaytesting.SigninActivity.this, LoginActivity.class);
+        Intent mainIntent = new Intent(SignupActivity.this, LoginActivity.class);
         mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(mainIntent);
         finish();
@@ -258,6 +252,9 @@ public class SigninActivity extends AppCompatActivity implements View.OnClickLis
         switch (v.getId()) {
             case R.id.button_register:
                 registerUser();
+                break;
+            case R.id.tvSignIn:
+                startActivity(new Intent(this, LoginActivity.class));
                 break;
         }
     }

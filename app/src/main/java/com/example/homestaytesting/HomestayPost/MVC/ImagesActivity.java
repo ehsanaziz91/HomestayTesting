@@ -1,4 +1,4 @@
-package com.example.homestaytesting;
+package com.example.homestaytesting.HomestayPost.MVC;
 
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.homestaytesting.Modal.Upload;
+import com.example.homestaytesting.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,7 +26,7 @@ public class ImagesActivity extends AppCompatActivity {
 
     private ProgressBar progressBar;
 
-    private DatabaseReference databaseReference;
+    private DatabaseReference databaseRef;
     private List<Upload> Uploads;
 
     @Override
@@ -40,9 +42,9 @@ public class ImagesActivity extends AppCompatActivity {
 
         Uploads = new ArrayList<>();
 
-        databaseReference = FirebaseDatabase.getInstance().getReference("Uploads");
+        databaseRef = FirebaseDatabase.getInstance().getReference("Uploads");
 
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        databaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()){
