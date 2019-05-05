@@ -150,11 +150,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference xx = db.getReference();
 
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+/*        Intent intent = new Intent(LoginActivity.this, SplashScreenActivity.class);
         startActivity(intent);
-        finish();
+        finish();*/
 
-/*        xx.addValueEventListener(new ValueEventListener() {
+        xx.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot)
             {
@@ -170,7 +170,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     }
                     else if(usersData.getRole().equals("Owner"))
                     {
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        Intent intent = new Intent(LoginActivity.this, Main2Activity.class);
                         startActivity(intent);
                         finish();
 
@@ -188,7 +188,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });*/
+        });
 
     }
 

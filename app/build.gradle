@@ -54,4 +54,13 @@ dependencies {
     //implementation 'uk.co.chrisjenx:calligraphy:2.3.0'
     implementation 'lib.kingja.switchbutton:switchbutton:1.1.8'
     //implementation 'com.github.angads25:toggle:1.0.0'
+    implementation 'com.paypal.sdk:paypal-android-sdk:2.15.3'
+
+    //splash screen
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.15'
+    //dynamic-calendar
+    implementation 'com.github.sillebille:dynamic-calendar:1.0.1'
+
+    implementation 'com.github.psinetron:slycalendarview:0.0.9'
+
 }

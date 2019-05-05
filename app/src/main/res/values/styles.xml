@@ -3,9 +3,9 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/cloudshadow</item>
-        <item name="colorPrimaryDark">@color/crevice</item>
-        <item name="colorAccent">@color/desert</item>
+        <item name="colorPrimary">@color/tealblue</item>
+        <item name="colorPrimaryDark"></item>
+        <item name="colorAccent">@color/keppel</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -30,6 +30,13 @@
 
     <!-- ToolBar Custom Main Activity -->
     <style name="Toolbar.CustomMain" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+    </style>
+
+    <style name="AppFullScreenTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 
 </resources>

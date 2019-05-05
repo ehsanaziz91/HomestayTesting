@@ -2,12 +2,14 @@ package com.example.homestaytesting.HomestayPost;
 
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -30,10 +32,17 @@ import com.bumptech.glide.Glide;
 import com.example.homestaytesting.MainActivity;
 import com.example.homestaytesting.R;
 import com.example.homestaytesting.Modal.Upload;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -45,18 +54,20 @@ import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 
 public class FormActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
+    private static final String TAG = "Debug";
     private FirebaseAuth hmAuth;
     private String currentUserid;
 
     private static final int PICK_IMAGE_REQUEST = 1;
     private ImageView imgView;
-    private TextView tvPic, tvDetails, tvUploads;
-    private EditText editTextName, editTextDetails, editTextLocation, editTextPrice, editTextContact, editTextLat, editTextLang;
+    private TextView tvPic, tvDetails, tvLocation, tvLat, tvLang;
+    private EditText editTextName, editTextDetails, editTextPrice, editTextContact;
     private Spinner msPropertyType, msBedrooms, msBathroom;
     private Button btnSubmit;
     private RadioGroup rgFurnished;
@@ -92,10 +103,11 @@ public class FormActivity extends AppCompatActivity implements AdapterView.OnIte
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         imgView = (ImageView) findViewById(R.id.imgView);
-        tvUploads = (TextView) findViewById(R.id.tvUploads);
+        tvLocation = findViewById(R.id.tvLocation);
+        tvLat = findViewById(R.id.tvLat);
+        tvLang = findViewById(R.id.tvLang);
         editTextName = (EditText) findViewById(R.id.editTextName);
         editTextDetails = (EditText) findViewById(R.id.editTextDetails);
-        editTextLocation = (EditText) findViewById(R.id.editTextLocation);
         editTextPrice = (EditText) findViewById(R.id.editTextPrice);
         editTextContact = (EditText) findViewById(R.id.editTextContact);
         btnSubmit = (Button) findViewById(R.id.btnSubmit);
@@ -152,8 +164,46 @@ public class FormActivity extends AppCompatActivity implements AdapterView.OnIte
         msBathroom.setOnItemSelectedListener(this);
 
         //testing lat lang
-        editTextLat = (EditText) findViewById(R.id.editTextLat);
-        editTextLang = (EditText) findViewById(R.id.editTextLang);
+        tvLat = findViewById(R.id.tvLat);
+        tvLat.setVisibility(EditText.GONE);
+        tvLang = findViewById(R.id.tvLang);
+        tvLang.setVisibility(EditText.GONE);
+
+        //txtView = findViewById(R.id.tvLocation);
+
+        // Initialize Places.
+        Places.initialize(getApplicationContext(), "AIzaSyAWali3rmbAHlOWE2eS7J4yhKBThZD31IA");
+        // Create a new Places client instance.
+        PlacesClient placesClient = Places.createClient(this);
+
+        // Initialize the AutocompleteSupportFragment.
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG));
+
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+                // TODO: Get info about the selected place.
+                //txtView.setText(place.getName()+","+place.getAddress()+","+place.getId());
+                tvLocation.setText(String.format(place.getAddress()));
+                Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
+                LatLng queriedLocation = place.getLatLng();
+                Log.v("Latitude is", "" + queriedLocation.latitude);
+                Log.v("Longitude is", "" + queriedLocation.longitude);
+                tvLat.setText(String.format("" + queriedLocation.latitude));
+                tvLang.setText(String.format("" + queriedLocation.longitude));
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
+                // TODO: Handle the error.
+                Log.i(TAG, "An error occurred: " + status);
+            }
+        });
 
         storageRef = FirebaseStorage.getInstance().getReference("Uploads");
         databaseRef = FirebaseDatabase.getInstance().getReference("Uploads");
@@ -168,20 +218,12 @@ public class FormActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-        tvUploads.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openImagesActivity();
-            }
-        });
-
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 submit();
             }
         });
-
     }
 
     @Override
@@ -290,29 +332,32 @@ public class FormActivity extends AppCompatActivity implements AdapterView.OnIte
                                 public void run() {
                                     //progressBar.setProgress(0);
                                 }
-                            },500);
+                            },1000); // Millisecond 1000 = 1 sec
 
                             fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                 @Override
                                 public void onSuccess(Uri uri) {
                                     Toast.makeText(FormActivity.this, "Upload Successfully", Toast.LENGTH_LONG).show();
+                                    String hmId = databaseRef.push().getKey();
                                     Upload upload = new Upload(editTextName.getText().toString().trim(),uri.toString(),
                                             editTextDetails.getText().toString().trim(),
-                                            editTextLocation.getText().toString().trim(),
+                                            tvLocation.getText().toString().trim(),
                                             editTextPrice.getText().toString().trim(),
                                             editTextContact.getText().toString().trim(),
+
                                             //testing lat lang
                                             FirebaseAuth.getInstance().getCurrentUser().getUid(),
-                                            Double.parseDouble(editTextLat.getText().toString().trim()),
-                                            Double.parseDouble(editTextLang.getText().toString().trim()),
+                                            Double.parseDouble(tvLat.getText().toString().trim()),
+                                            Double.parseDouble(tvLang.getText().toString().trim()),
                                             msPropertyType.getSelectedItem().toString().trim(),
                                             msBedrooms.getSelectedItem().toString().trim(),
                                             msBathroom.getSelectedItem().toString().trim(),
-                                            hmFurnish = rbFurnished.getText().toString().trim()
+                                            hmFurnish = rbFurnished.getText().toString().trim(),
+                                            hmId.trim()
 
                                             //taskSnapshot.getMetadata().getReference().getDownloadUrl().toString());
                                             );
-                                    //String uploadId = databaseRef.push().getKey();
+                                    //String hmId = databaseRef.push().getKey();
 
                                     Calendar calFordDate = Calendar.getInstance();
                                     SimpleDateFormat currentDate = new SimpleDateFormat("dd-MMMM-yyyy");
@@ -369,11 +414,6 @@ public class FormActivity extends AppCompatActivity implements AdapterView.OnIte
         }else {
             Toast.makeText(this, "No image selected !", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private void openImagesActivity() {
-        Intent intent = new Intent(this, PostListingActivity.class);
-        startActivity(intent);
     }
 
     //using for spinner dropdown

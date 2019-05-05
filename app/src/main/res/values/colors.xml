@@ -44,4 +44,11 @@
     <color name="cloudshadow">#693d3d</color>
     <color name="desert">#ba5536</color>
     <color name="redclay">#a43820</color>
+
+    <color name="middleblue">#75C9E2</color>
+    <color name="nonphotoblue">#95E1EF</color>
+    <color name="diamond">#edfbfe</color>
+
+    <color name="tealblue">#116384</color>
+    <color name="keppel">#3C99AA</color>
 </resources>

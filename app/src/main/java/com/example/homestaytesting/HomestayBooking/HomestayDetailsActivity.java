@@ -1,7 +1,7 @@
-package com.example.homestaytesting;
+package com.example.homestaytesting.HomestayBooking;
 
-//import android.app.FragmentManager;
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,37 +14,31 @@ import android.location.LocationListener;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentManager;
-import android.os.Bundle;
-import android.util.Log;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.homestaytesting.HomestayBooking.HomestayListingActivity;
-import com.example.homestaytesting.HomestayPost.FormActivity;
 import com.example.homestaytesting.HomestayPost.PostDetailsActivity;
 import com.example.homestaytesting.HomestayPost.PostListingActivity;
-import com.example.homestaytesting.HomestayPost.PostUpdateActivity;
+import com.example.homestaytesting.MainActivity;
 import com.example.homestaytesting.Modal.Upload;
-import com.example.homestaytesting.Modal.User;
+import com.example.homestaytesting.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -54,20 +48,32 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.StorageReference;
+import com.paypal.android.sdk.payments.PayPalConfiguration;
+import com.paypal.android.sdk.payments.PayPalPayment;
+import com.paypal.android.sdk.payments.PayPalService;
+import com.paypal.android.sdk.payments.PaymentActivity;
+import com.paypal.android.sdk.payments.PaymentConfirmation;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback,
-        NavigationView.OnNavigationItemSelectedListener,
+public class HomestayDetailsActivity extends AppCompatActivity implements OnMapReadyCallback,
         LocationListener,
         GoogleMap.OnMarkerClickListener,
         GoogleApiClient.ConnectionCallbacks,
@@ -81,97 +87,110 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     LocationRequest locationRequest;
 
     private ChildEventListener mChildEventListener;
-    private DatabaseReference UsersRef,Postsref,LikesRef;
-    private FirebaseAuth hmAuth;
-    private String currentUserid;
     Marker marker;
 
     NavigationView navigationView;
 
+    private Toolbar mToolbar;
+
+    private StorageReference storageRef;
+    private DatabaseReference databaseRef, databaseReference;
+
+    private FirebaseAuth hmAuth;
+    private FirebaseDatabase firebaseDb;
+    private String currentUserid, PostKey, imgUrl, hmName, hmLocation, hmPrice, hmDetails, hmContact, hmLat, hmLang, hmId;
+
+    private ImageView imgView;
+    private TextView tvName, tvName1, tvLocation, tvPrice, tvDetails, tvContact;
+    private Button btnPay, btnBook;
+
+    CoordinatorLayout rootLayout;
+    BottomNavigationView bottomNavigationView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setContentView(R.layout.activity_homestay_details);
 
-        hmAuth = FirebaseAuth.getInstance();
-        currentUserid = hmAuth.getCurrentUser().getUid();
+        mToolbar = (Toolbar) findViewById(R.id.find_toolbar);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle("Homestay Details");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        Postsref = FirebaseDatabase.getInstance().getReference().child("Uploads");
-
-        //DetermineRole();
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, HomestayListingActivity.class);
-                MainActivity.this.startActivity(intent);
-            }
-        });
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-/*        if (savedInstanceState == null){
-            getSupportFragmentManager().beginTransaction().replace(R.id.mainLayout, new SigninFragment()).commit();
-            navigationView.setCheckedItem(R.id.map1);
-        }*/
-
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        imgView = findViewById(R.id.imgView);
+        tvName = findViewById(R.id.tvName);
+        tvName1 = findViewById(R.id.tvName1);
+        tvLocation = findViewById(R.id.tvLocation);
+        tvPrice = findViewById(R.id.tvPrice);
+        tvDetails = findViewById(R.id.tvDetails);
+        tvContact = findViewById(R.id.tvContact);
+        btnPay = findViewById(R.id.buttonPay);
+        btnBook = findViewById(R.id.buttonBook);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        //Button Hide Visible
-/*        Menu menuNav= navigationView.getMenu();
-        MenuItem nav_item2 = menuNav.findItem(R.id.nav_slideshow);
-        nav_item2.setVisible(false);*/
+        hmAuth = FirebaseAuth.getInstance();
+        currentUserid = hmAuth.getCurrentUser().getUid();
 
-/*        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+        PostKey = getIntent().getExtras().get("PostKey").toString();
+        databaseRef = FirebaseDatabase.getInstance().getReference().child("Uploads").child(PostKey);
+        databaseReference = FirebaseDatabase.getInstance().getReference("Booking");
 
-
-        dbRef.addValueEventListener(new ValueEventListener() {
+        databaseRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+            public void onDataChange (@NonNull DataSnapshot dataSnapshot)
             {
-                if(!dataSnapshot.exists())
-                {
-                    final FirebaseUser user = hmAuth.getCurrentUser();
-                    final String uid = user.getUid();
+                if (dataSnapshot.exists()) {
 
-                    User usersData = dataSnapshot.child("Users").child(uid).getValue(User.class);
+                    imgUrl = dataSnapshot.child("imgUrl").getValue().toString();
+                    hmName = dataSnapshot.child("hmName").getValue().toString();
+                    //hmLocation = dataSnapshot.child("hmLocation").getValue().toString();
+                    hmPrice = dataSnapshot.child("hmPrice").getValue().toString();
+                    hmDetails = dataSnapshot.child("hmDetails").getValue().toString();
+                    hmContact = dataSnapshot.child("hmContact").getValue().toString();
+                    hmLat = dataSnapshot.child("lat").getValue().toString();
+                    hmLang = dataSnapshot.child("lang").getValue().toString();
+                    hmId = dataSnapshot.child("hmId").getValue().toString();
 
-                    if(usersData.getRole().equals("Guest"))
-                    {
-                        Menu menuNav= navigationView.getMenu();
-                        MenuItem nav_item2 = menuNav.findItem(R.id.nav_slideshow);
-                        nav_item2.setVisible(true);
+                    Toast.makeText(HomestayDetailsActivity.this, hmId, Toast.LENGTH_SHORT).show();
+
+                    Double lat = Double.valueOf(hmLat);
+                    Double lang = Double.valueOf(hmLang);
+
+                    LatLng latLng = new LatLng(lat, lang);
+
+                    /*----------to get Address from coordinates ------------- */
+                    String address = null;
+                    Geocoder gcd = new Geocoder(getBaseContext(), Locale.getDefault());
+                    List<Address> addresses;
+                    try {
+                        addresses = gcd.getFromLocation(lat, lang, 1);
+                        if (addresses.size() > 0)
+                            //System.out.println(addresses.get(0).getAddressLine(0));
+                        address = addresses.get(0).getAddressLine(0);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                    else if(usersData.getRole().equals("Owner"))
-                    {
-                        Menu menuNav= navigationView.getMenu();
-                        MenuItem nav_item2 = menuNav.findItem(R.id.nav_slideshow);
-                        nav_item2.setVisible(true);
-                    }
-                    else if(usersData.getRole().equals("Admin"))
-                    {
-                        Menu menuNav= navigationView.getMenu();
-                        MenuItem nav_item2 = menuNav.findItem(R.id.nav_slideshow);
-                        nav_item2.setVisible(true);
-                    }
-                    else {
-                        Menu menuNav= navigationView.getMenu();
-                        MenuItem nav_item2 = menuNav.findItem(R.id.nav_slideshow);
-                        nav_item2.setVisible(true);
-                    }
+
+                    tvName.setText(hmName);
+                    tvName1.setText(hmName);
+                    tvLocation.setText(address);
+                    tvPrice.setText("RM " + hmPrice + "/night");
+                    tvDetails.setText(hmDetails);
+                    tvContact.setText(hmContact);
+
+                    Picasso.with(HomestayDetailsActivity.this)
+                            .load(imgUrl)
+                            //.placeholder(R.drawable.profile)
+                            .fit()
+                            .centerCrop()
+                            .into(imgView);
+
+                    /*                  Glide.with(PostDetailsActivity.this).load(imgUrl).into(imgView);*/
                 }
 
             }
@@ -180,119 +199,133 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });*/
+        });
+
+        //PayPal Implementation
+        btnPay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                payPalPayment();
+            }
+        });
+
+        Intent intent = new Intent(this, PayPalService.class);
+        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, configuration);
+        startService(intent);
+
+        //Book now
+        btnBook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent1 = new Intent(HomestayDetailsActivity.this, HomestayBookingActivity.class);
+                intent1.putExtra("PostKey", PostKey);
+                startActivity(intent1);
+                return;
+            }
+        });
     }
 
     @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if(id == android.R.id.home)
+        {
+            SendUserToMainActivity();
         }
-
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_home) {
-            Intent intent = new Intent(MainActivity.this, UserProfileActivity.class);
-            startActivity(intent);
-
-        }else if (id == R.id.nav_camera) {
-            Intent intent = new Intent(MainActivity.this, Main2Activity.class);
-            startActivity(intent);
-
-        } else if (id == R.id.nav_gallery) {
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(intent);
-
-        } else if (id == R.id.nav_slideshow) {
-            Intent intent = new Intent(MainActivity.this, FormActivity.class);
-            startActivity(intent);
-
-        } else if (id == R.id.nav_manage) {
-/*            Intent intent = new Intent(MainActivity.this, BottomNavigationView.class);
-            startActivity(intent);*/
-
-        }else if (id == R.id.nav_profile) {
-            Intent intent = new Intent(MainActivity.this, ToolbarTestingActivity.class);
-            startActivity(intent);
-
-        }else if (id == R.id.nav_viewAds) {
-            Intent intent = new Intent(MainActivity.this, PostUpdateActivity.class);
-            startActivity(intent);
-
-        }else if (id == R.id.nav_signup) {
-
-/*            SigninFragment signinFragment = new SigninFragment();
-            FragmentManager manager = getSupportFragmentManager();
-            //Fragment manager = getSupportFragmentManager();
-            manager.beginTransaction().replace(R.id.mainLayout, signinFragment).commit();*/
-
-/*            Intent intent = new Intent(MainActivity.this, SignupActivity.class);
-            startActivity(intent);*/
-            //return true;
-
-        }else if (id == R.id.nav_logout) {
-            logout();
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-    private void logout() {
-        hmAuth.signOut();
-        sendToLogin();
-    }
-
-    private void sendToLogin() {
-        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-        startActivity(intent);
+    private void SendUserToMainActivity()
+    {
+        Intent mainIntent = new Intent(HomestayDetailsActivity.this, HomestayListingActivity.class);
+        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(mainIntent);
         finish();
+    }
+
+    private int PAYPAL_REQUEST_CODE = 1;
+    private static PayPalConfiguration configuration = new PayPalConfiguration()
+            .environment(PayPalConfiguration.ENVIRONMENT_SANDBOX)
+            .clientId(PayPalConfig.PAYPAL_CLIENT_ID);
+
+    private void payPalPayment() {
+        PayPalPayment payment = new PayPalPayment(new BigDecimal(0.10), "MYR", "Homestay Booking",
+                PayPalPayment.PAYMENT_INTENT_SALE);
+
+        Intent intent = new Intent(this, PaymentActivity.class);
+
+        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, configuration);
+        intent.putExtra(PaymentActivity.EXTRA_PAYMENT, payment);
+
+        startActivityForResult(intent, PAYPAL_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PAYPAL_REQUEST_CODE){
+            if (resultCode == Activity.RESULT_OK){
+                PaymentConfirmation confirmation = data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
+                if (confirmation != null){
+                    try {
+                        JSONObject jsonObj = new JSONObject(confirmation.toJSONObject().toString());
+                        String paymentResponse = jsonObj.getJSONObject("response").getString("state");
+
+                        if (paymentResponse.equals("approved")){
+                            Toast.makeText(getApplicationContext(), "Payment Successful", Toast.LENGTH_LONG).show();
+
+                            HashMap payment = new HashMap();
+
+                            payment.put("hmName", hmName);
+                            payment.put("bookPayment", true);
+
+                            Calendar calFordDate = Calendar.getInstance();
+                            SimpleDateFormat currentDate = new SimpleDateFormat("dd-MMMM-yyyy");
+                            String saveCurrentDate = currentDate.format(calFordDate.getTime());
+
+                            Calendar calFordTime = Calendar.getInstance();
+                            SimpleDateFormat currentTime = new SimpleDateFormat("HH:mm:ss");
+                            String saveCurrentTime = currentTime.format(calFordTime.getTime());
+
+                            String postRandomName = saveCurrentDate + saveCurrentTime;
+
+                            databaseReference.child(currentUserid + postRandomName).setValue(payment);
+                        }
+                    }catch (JSONException e){
+                        e.printStackTrace();
+                    }
+                }
+            }else {
+                Toast.makeText(getApplicationContext(), "Payment Unsuccessful", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopService(new Intent(this, PayPalService.class));
+        super.onDestroy();
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        lastLocation = location;
-        String markerText = "You're here !";
 
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        PostKey = getIntent().getExtras().get("PostKey").toString();
+        databaseRef = FirebaseDatabase.getInstance().getReference().child("Uploads").child(PostKey);
+        lastLocation = location;
+        //String markerText = "You're here !";
+
+        Double lat = Double.valueOf(hmLat);
+        Double lang = Double.valueOf(hmLang);
+
+        LatLng latLng = new LatLng(lat, lang);
         Marker marker  = mMap.addMarker(new MarkerOptions()
                 .position(latLng)
-                .title(markerText)
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
-        //to show marker info window without clicked
-        marker.showInfoWindow();
+        //to show marker info window without clicked .title(markerText)
+        //marker.showInfoWindow();
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
@@ -319,17 +352,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        String b = cityName.toString();
-        String c = stateName.toString();
-
-/*        Toast.makeText(MapActivity.this, b, Toast.LENGTH_SHORT).show();
-        Toast.makeText(MapActivity.this, c, Toast.LENGTH_SHORT).show();
-
-        String s = longitude + "\n" + latitude + "\n\nMy Currrent City is: " + cityName;
-        //editLocation.setText(s);
-
-        Toast.makeText(MapActivity.this, s, Toast.LENGTH_SHORT).show();*/
     }
 
     @Override
@@ -364,7 +386,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         mMap.setMyLocationEnabled(true);
 
-        DatabaseReference UsersRef = FirebaseDatabase.getInstance().getReference();
+/*        DatabaseReference UsersRef = FirebaseDatabase.getInstance().getReference();
         final DatabaseReference Postsref = UsersRef.child("Uploads");
 
         Postsref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -403,8 +425,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             LatLng location = new LatLng(upload.getLat(),upload.getLang());
                             markerOptions.position(location);
                             markerOptions.title(upload.getHmName());
-                            markerOptions.snippet("RM " + upload.getHmPrice()+"\n"+"1 h 52 m"+"\n"+"1 KM");
-                            //markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
                             markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.homestay));
 
                             marker = mMap.addMarker(markerOptions);
@@ -413,33 +433,33 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         e.printStackTrace();
                     }
 
-/*                    String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+*//*                    String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
                     String city = addresses.get(0).getLocality();
                     String state = addresses.get(0).getAdminArea();
                     String country = addresses.get(0).getCountryName();
                     String postalCode = addresses.get(0).getPostalCode();
-                    String knownName = addresses.get(0).getFeatureName(); // Only if available else return NULL*/
+                    String knownName = addresses.get(0).getFeatureName(); // Only if available else return NULL*//*
 
-/*                    LatLng location = new LatLng(upload.getLat(),upload.getLang());
+*//*                    LatLng location = new LatLng(upload.getLat(),upload.getLang());
                     markerOptions.position(location);
                     markerOptions.title(upload.getHmName());
                     markerOptions.snippet("RM " + upload.getHmPrice()+"\n"+"1 h 52 m"+"\n"+"1 KM");
                     markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
 
-                    marker = mMap.addMarker(markerOptions);*/
+                    marker = mMap.addMarker(markerOptions);*//*
 
-/*                    String b = location.toString();
+*//*                    String b = location.toString();
 
-                    Toast.makeText(MapActivity.this, b, Toast.LENGTH_SHORT).show();*/
+                    Toast.makeText(MapActivity.this, b, Toast.LENGTH_SHORT).show();*//*
 
-/*                    markerOptions.visible(false);// We dont need to show, if its less than 100 meter we can show, otherwise we will just create and we will make it visble or not later
+*//*                    markerOptions.visible(false);// We dont need to show, if its less than 100 meter we can show, otherwise we will just create and we will make it visble or not later
 
                     marker = mMap.addMarker(markerOptions);
 
                     if (SphericalUtil.computeDistanceBetween(location, marker.getPosition()) < 100) {
                         marker.setVisible(true);
 
-                    }*/
+                    }*//*
 
                     mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                         @Override
@@ -459,7 +479,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                         //Toast.makeText(MapActivity.this, PostKey, Toast.LENGTH_SHORT).show();
 
                                         if(a.equalsIgnoreCase(string)){
-                                            Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
+                                            Intent intent = new Intent(HomestayDetailsActivity.this, PostDetailsActivity.class);
                                             intent.putExtra("PostKey", PostKey);
                                             startActivity(intent);
                                             return;
@@ -481,39 +501,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
-
-        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-
-            @Override
-            public View getInfoWindow(Marker arg0) {
-                return null;
-            }
-
-            @Override
-            public View getInfoContents(Marker marker) {
-
-                Context context = getApplicationContext();
-
-                LinearLayout info = new LinearLayout(context);
-                info.setOrientation(LinearLayout.VERTICAL);
-
-                TextView title = new TextView(context);
-                title.setTextColor(Color.BLACK);
-                title.setGravity(Gravity.CENTER);
-                title.setTypeface(null, Typeface.BOLD);
-                title.setText(marker.getTitle());
-
-                TextView snippet = new TextView(context);
-                snippet.setTextColor(Color.GRAY);
-                snippet.setText(marker.getSnippet());
-
-                info.addView(title);
-                info.addView(snippet);
-
-                return info;
-            }
-        });
+        });*/
     }
 
     private void buildGoogleApiClient() {

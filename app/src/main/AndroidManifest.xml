@@ -29,7 +29,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MapActivity"></activity>
+        <activity android:name=".HomestayBooking.HomestayBookingActivity" />
+        <activity android:name=".HomestayBooking.HomestayDetailsActivity" />
+        <activity android:name=".HomestayBooking.ImageActivity" />
+        <activity android:name=".HomestayBooking.HomestayListingActivity" />
+        <activity android:name=".Main2Activity" />
+        <activity android:name=".MapActivity" />
         <activity android:name=".HomestayPost.PostUpdateActivity" />
         <activity android:name=".HomestayPost.PostListingActivity" />
         <activity android:name=".ToolbarTestingActivity" />
@@ -43,6 +48,9 @@
             android:name=".BottomNavigation.BottomNavigationActivity"
             android:label="@string/title_activity_bottom_navigation" />
         <activity android:name=".SignupActivity" />
+        <activity
+            android:name=".SplashScreenActivity"
+            android:theme="@style/AppFullScreenTheme"/>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").

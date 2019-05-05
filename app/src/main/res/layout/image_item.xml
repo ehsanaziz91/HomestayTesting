@@ -18,17 +18,32 @@
             android:layout_width="match_parent"
             android:layout_height="180dp"/>
 
-        <TextView
-            android:id="@+id/tvName"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="15dp"
-            android:padding="1dp"
-            android:text="Homestay Name"
-            android:textColor="@color/black"
-            android:textSize="17sp"
-            android:textStyle="bold"/>
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="15dp"
+                android:padding="1dp"
+                android:text="Homestay Name"
+                android:textColor="@color/black"
+                android:textSize="17sp"
+                android:textStyle="bold"/>
+
+            <ImageView
+                android:id="@+id/popupMenu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_alignParentRight="true"
+                android:onClick="showPopup"
+                android:src="@drawable/ic_more_vert_black_24dp"/>
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/tvLocation"

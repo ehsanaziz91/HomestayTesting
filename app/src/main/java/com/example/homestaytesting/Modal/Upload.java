@@ -14,13 +14,14 @@ public class Upload {
     private String hmBedrooms;
     private String hmBathroom;
     private String hmFurnish;
+    private String hmId;
 
     public Upload(){
         //empty constructor needed
     }
 
     public Upload(String name, String imageUrl, String details, String location, String price, String contact, String uid,
-                  Double latitude, Double longitude, String propertyType, String bedrooms, String bathroom, String furnished){
+                  Double latitude, Double longitude, String propertyType, String bedrooms, String bathroom, String furnished, String hmid){
         if (name.trim().equals("")){
             name = "No Name";
         }
@@ -37,6 +38,7 @@ public class Upload {
         hmBedrooms = bedrooms;
         hmBathroom = bathroom;
         hmFurnish = furnished;
+        hmId = hmid;
 
     }
 
@@ -142,6 +144,14 @@ public class Upload {
 
     public void setHmFurnish(String hmFurnish) {
         this.hmFurnish = hmFurnish;
+    }
+
+    public String getHmId() {
+        return hmId;
+    }
+
+    public void setHmId(String hmId) {
+        this.hmId = hmId;
     }
 
 }

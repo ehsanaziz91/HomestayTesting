@@ -179,6 +179,8 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                                 if (task.isSuccessful()) {
                                     Toast.makeText(SignupActivity.this, getString(R.string.registration_success), Toast.LENGTH_LONG).show();
                                     finish();
+                                    //block supaya dia tak trus masuk ke mainpage
+                                    hmAuth.signOut();
                                     SendUserToLoginActivity();
 
                                 } else {

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/main_bar_layout"
-    android:background="@color/cloudshadow"
+    android:background="@color/tealblue"
     android:minHeight="?attr/actionBarSize"
     app:theme="@style/ToolBarStyle"
     app:titleTextAppearance="@style/Toolbar.TitleText">
