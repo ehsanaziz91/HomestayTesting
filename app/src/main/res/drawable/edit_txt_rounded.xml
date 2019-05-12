@@ -8,9 +8,9 @@
                 android:color="@color/middleblue" />
             <gradient
                 android:type="linear"
-                android:angle="270"
-                android:startColor="#edfbfe"
-                android:endColor="#FFFFFF" />
+                android:angle="270" />
+                <!--android:startColor="#edfbfe"
+                android:endColor="#FFFFFF"-->
         </shape>
     </item>
 </selector>

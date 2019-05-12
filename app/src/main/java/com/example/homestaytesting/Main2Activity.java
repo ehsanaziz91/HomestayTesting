@@ -69,8 +69,8 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 if(dataSnapshot.exists()){
-                    String userName = ("Name : "+dataSnapshot.child("name").getValue().toString());
-                    String userEmail = ("Email : "+dataSnapshot.child("email").getValue().toString());
+                    String userName = dataSnapshot.child("name").getValue().toString();
+                    String userEmail = dataSnapshot.child("email").getValue().toString();
                     String image = dataSnapshot.child("profileimage2").getValue().toString();
 
                     tvName.setText(userName);

@@ -112,7 +112,9 @@ public class HomestayListingActivity extends AppCompatActivity {
                 holder.hmName.setText(model.getHmName());
                 //holder.hmDetails.setText(model.getHmDetails());
                 holder.hmLocation.setText(model.getHmLocation());
-                holder.hmPrice.setText("RM " + model.getHmPrice());
+                holder.hmPrice.setText("RM " + model.getHmPrice()+ " per night");
+                holder.hmPropertyType.setText(model.getHmPropertyType());
+                holder.hmFurnish.setText(model.getHmFurnish());
                 //holder.hmContact.setText(model.getHmContact());
                 //Glide.with(MyAgencyPost.this).load(model.getPostImage()).into(holder.productimage);
                 Picasso.with(HomestayListingActivity.this)
@@ -153,7 +155,7 @@ public class HomestayListingActivity extends AppCompatActivity {
 
     public static class PostsViewHolder extends RecyclerView.ViewHolder
     {
-        TextView hmName, hmDetails, hmLocation, hmPrice, hmContact;
+        TextView hmName, hmDetails, hmLocation, hmPrice, hmContact, hmPropertyType, hmFurnish;
         ImageView hmImage;
 
 
@@ -161,6 +163,8 @@ public class HomestayListingActivity extends AppCompatActivity {
         {
             super(itemView);
 
+            hmFurnish = itemView.findViewById(R.id.tvFurnish);
+            hmPropertyType = itemView.findViewById(R.id.tvProperty);
             hmName = itemView.findViewById(R.id.tvName);
             //hmDetails = itemView.findViewById(R.id.tvDetails);
             hmLocation = itemView.findViewById(R.id.tvLocation);

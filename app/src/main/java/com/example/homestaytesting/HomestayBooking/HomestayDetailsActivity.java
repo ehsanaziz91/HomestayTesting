@@ -15,9 +15,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -25,8 +29,10 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +41,7 @@ import com.example.homestaytesting.HomestayPost.PostListingActivity;
 import com.example.homestaytesting.MainActivity;
 import com.example.homestaytesting.Modal.Upload;
 import com.example.homestaytesting.R;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
@@ -98,12 +105,17 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
 
     private FirebaseAuth hmAuth;
     private FirebaseDatabase firebaseDb;
-    private String currentUserid, PostKey, imgUrl, hmName, hmLocation, hmPrice, hmDetails, hmContact, hmLat, hmLang, hmId;
+    private String currentUserid, PostKey, imgUrl, hmName, hmLocation, hmPrice, hmDetails, hmContact, hmLat, hmLang, hmId,
+            hmBathroom, hmBedrooms, hmPropertyType, hmFurnish, hmFacilities;
 
     private ImageView imgView;
-    private TextView tvName, tvName1, tvLocation, tvPrice, tvDetails, tvContact;
+    private TextView tvName, tvName1, tvLocation, tvPrice, tvDetails, tvContact, tvBed, tvBath, tvProperty, tvFurnish;
     private Button btnPay, btnBook;
+    private FloatingActionsMenu fabMenu;
+    private FloatingActionButton fAB1, fAB2, fAB3;
 
+    NestedScrollView nestedScrollView;
+    FrameLayout frameLayout;
     CoordinatorLayout rootLayout;
     BottomNavigationView bottomNavigationView;
 
@@ -125,8 +137,49 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         tvPrice = findViewById(R.id.tvPrice);
         tvDetails = findViewById(R.id.tvDetails);
         tvContact = findViewById(R.id.tvContact);
+        tvBed = findViewById(R.id.tvBed);
+        tvBath = findViewById(R.id.tvBath);
+        tvProperty = findViewById(R.id.tvProperty);
+        tvFurnish = findViewById(R.id.tvFurnish);
         btnPay = findViewById(R.id.buttonPay);
         btnBook = findViewById(R.id.buttonBook);
+
+/*        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(HomestayDetailsActivity.this, HomestayListingActivity.class);
+                HomestayDetailsActivity.this.startActivity(intent);
+            }
+        });*/
+        fabMenu = findViewById(R.id.fab);
+        fAB1 = findViewById(R.id.fab1);
+        fAB1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(HomestayDetailsActivity.this, "Contact by Email", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        fAB2= findViewById(R.id.fab2);
+        fAB2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(HomestayDetailsActivity.this, "Contact by SMS", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        fAB3 = findViewById(R.id.fab3);
+        fAB3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(HomestayDetailsActivity.this, "Contact by Phone", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_nav);
+        CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) bottomNavigationView.getLayoutParams();
+        layoutParams.setBehavior(new BottomNavigationViewBehavior());
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -156,7 +209,13 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
                     hmLang = dataSnapshot.child("lang").getValue().toString();
                     hmId = dataSnapshot.child("hmId").getValue().toString();
 
-                    Toast.makeText(HomestayDetailsActivity.this, hmId, Toast.LENGTH_SHORT).show();
+                    hmBathroom = dataSnapshot.child("hmBathroom").getValue().toString();
+                    hmBedrooms = dataSnapshot.child("hmBedrooms").getValue().toString();
+                    hmPropertyType = dataSnapshot.child("hmPropertyType").getValue().toString();
+                    hmFurnish = dataSnapshot.child("hmFurnish").getValue().toString();
+                    //hmFacilities = dataSnapshot.child("hmFacilities").getValue().toString();
+
+                    //Toast.makeText(HomestayDetailsActivity.this, hmId, Toast.LENGTH_SHORT).show();
 
                     Double lat = Double.valueOf(hmLat);
                     Double lang = Double.valueOf(hmLang);
@@ -179,9 +238,13 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
                     tvName.setText(hmName);
                     tvName1.setText(hmName);
                     tvLocation.setText(address);
-                    tvPrice.setText("RM " + hmPrice + "/night");
+                    tvPrice.setText("RM " + hmPrice + " per night");
                     tvDetails.setText(hmDetails);
                     tvContact.setText(hmContact);
+                    tvBed.setText(hmBedrooms);
+                    tvBath.setText(hmBathroom);
+                    tvProperty.setText(hmPropertyType);
+                    tvFurnish.setText(hmFurnish);
 
                     Picasso.with(HomestayDetailsActivity.this)
                             .load(imgUrl)
@@ -223,6 +286,49 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
                 return;
             }
         });
+    }
+
+    public class BottomNavigationViewBehavior extends CoordinatorLayout.Behavior<BottomNavigationView> {
+
+        private int height;
+
+        @Override
+        public boolean onLayoutChild(CoordinatorLayout parent, BottomNavigationView child, int layoutDirection) {
+            height = child.getHeight();
+            return super.onLayoutChild(parent, child, layoutDirection);
+        }
+
+        @Override
+        public boolean onStartNestedScroll(@NonNull CoordinatorLayout coordinatorLayout,
+                                           BottomNavigationView child, @NonNull
+                                                   View directTargetChild, @NonNull View target,
+                                           int axes, int type)
+        {
+            return axes == ViewCompat.SCROLL_AXIS_VERTICAL;
+        }
+
+        @Override
+        public void onNestedScroll(@NonNull CoordinatorLayout coordinatorLayout, @NonNull BottomNavigationView child,
+                                   @NonNull View target, int dxConsumed, int dyConsumed,
+                                   int dxUnconsumed, int dyUnconsumed,
+                                   @ViewCompat.NestedScrollType int type)
+        {
+            if (dyConsumed > 0) {
+                slideDown(child);
+            } else if (dyConsumed < 0) {
+                slideUp(child);
+            }
+        }
+
+        private void slideUp(BottomNavigationView child) {
+            child.clearAnimation();
+            child.animate().translationY(0).setDuration(200);
+        }
+
+        private void slideDown(BottomNavigationView child) {
+            child.clearAnimation();
+            child.animate().translationY(height).setDuration(200);
+        }
     }
 
     @Override

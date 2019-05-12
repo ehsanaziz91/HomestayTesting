@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.homestaytesting.Main2Activity;
 import com.example.homestaytesting.MainActivity;
 import com.example.homestaytesting.R;
 import com.example.homestaytesting.Modal.Upload;
@@ -236,7 +237,7 @@ public class FormActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void SendUserToMainActivity() {
-        Intent mainIntent = new Intent(FormActivity.this, MainActivity.class);
+        Intent mainIntent = new Intent(FormActivity.this, Main2Activity.class);
         mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(mainIntent);
         finish();

@@ -11,31 +11,23 @@
         <item
             android:id="@+id/nav_profile"
             android:icon="@drawable/ic_person"
-            android:title="Profile" />
+            android:title="My Profile" />
         <item
-            android:id="@+id/nav_viewAds"
+            android:id="@+id/nav_booking"
             android:icon="@drawable/ic_local"
-            android:title="My Ads" />
+            android:title="My Bookings" />
         <item
-            android:id="@+id/nav_signup"
+            android:id="@+id/nav_favourite"
+            android:icon="@drawable/ic_favorite_black_24dp"
+            android:title="Favourite" />
+        <item
+            android:id="@+id/nav_history"
+            android:icon="@drawable/ic_history_black_24dp"
+            android:title="History" />
+        <item
+            android:id="@+id/nav_aboutus"
             android:icon="@android:drawable/ic_dialog_info"
-            android:title="SignUp" />
-        <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Current Location" />
-        <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="SignIn" />
-        <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Post Ad" />
-        <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Update Data" />
+            android:title="About Us" />
         <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_exit"

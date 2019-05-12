@@ -33,6 +33,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.homestaytesting.HomestayBooking.HomestayDetailsActivity;
 import com.example.homestaytesting.HomestayBooking.HomestayListingActivity;
 import com.example.homestaytesting.HomestayPost.FormActivity;
 import com.example.homestaytesting.HomestayPost.PostDetailsActivity;
@@ -61,10 +62,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback,
         NavigationView.OnNavigationItemSelectedListener,
@@ -81,12 +87,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     LocationRequest locationRequest;
 
     private ChildEventListener mChildEventListener;
-    private DatabaseReference UsersRef,Postsref,LikesRef;
+    private DatabaseReference databaseRef;
     private FirebaseAuth hmAuth;
     private String currentUserid;
     Marker marker;
 
     NavigationView navigationView;
+
+    private TextView tvName, tvEmail;
+
+    // Code gambar
+    private CircleImageView circleImage;
+    final static int gallerypick = 1;
+    private StorageReference UserProfileImageRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,8 +110,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         hmAuth = FirebaseAuth.getInstance();
         currentUserid = hmAuth.getCurrentUser().getUid();
+        databaseRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserid);
 
-        Postsref = FirebaseDatabase.getInstance().getReference().child("Uploads");
+        // Code gambar
+        UserProfileImageRef = FirebaseStorage.getInstance().getReference().child("Uploads");
+        circleImage = findViewById(R.id.imageView);
 
         //DetermineRole();
 
@@ -124,6 +140,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        View headView = navigationView.getHeaderView(0);
+        circleImage = headView.findViewById(R.id.imageView);
+        tvName = headView.findViewById(R.id.tvName);
+        tvEmail = headView.findViewById(R.id.tvEmail);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -181,6 +202,35 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });*/
+
+        databaseRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                if(dataSnapshot.exists()){
+                    String userName = dataSnapshot.child("name").getValue().toString();
+                    String userEmail = dataSnapshot.child("email").getValue().toString();
+                    String image = dataSnapshot.child("profileimage2").getValue().toString();
+
+                    tvName.setText(userName);
+                    tvEmail.setText(userEmail);
+
+                    Picasso.with(MainActivity.this)
+                            .load(image)
+                            .fit()
+                            .centerCrop()
+                            .into(circleImage);
+                }
+                else {
+                    Log.d("LOGGER", "No such document");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -193,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    @Override
+/*    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
@@ -213,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -222,34 +272,35 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            Intent intent = new Intent(MainActivity.this, UserProfileActivity.class);
+            Intent intent = new Intent(MainActivity.this, MainActivity.class);
             startActivity(intent);
-
-        }else if (id == R.id.nav_camera) {
-            Intent intent = new Intent(MainActivity.this, Main2Activity.class);
-            startActivity(intent);
-
-        } else if (id == R.id.nav_gallery) {
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(intent);
-
-        } else if (id == R.id.nav_slideshow) {
-            Intent intent = new Intent(MainActivity.this, FormActivity.class);
-            startActivity(intent);
-
-        } else if (id == R.id.nav_manage) {
-/*            Intent intent = new Intent(MainActivity.this, BottomNavigationView.class);
-            startActivity(intent);*/
+            finish();
 
         }else if (id == R.id.nav_profile) {
+            Intent intent = new Intent(MainActivity.this, UserProfileActivity.class);
+            startActivity(intent);
+            finish();
+
+        } else if (id == R.id.nav_booking) {
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+
+        } else if (id == R.id.nav_favourite) {
+            Intent intent = new Intent(MainActivity.this, FormActivity.class);
+            startActivity(intent);
+            finish();
+
+        } else if (id == R.id.nav_history) {
+/*            Intent intent = new Intent(MainActivity.this, BottomNavigationActivity.class);
+            startActivity(intent);
+            finish();*/
+
+        }else if (id == R.id.nav_aboutus) {
+
             Intent intent = new Intent(MainActivity.this, ToolbarTestingActivity.class);
             startActivity(intent);
-
-        }else if (id == R.id.nav_viewAds) {
-            Intent intent = new Intent(MainActivity.this, PostUpdateActivity.class);
-            startActivity(intent);
-
-        }else if (id == R.id.nav_signup) {
+            finish();
 
 /*            SigninFragment signinFragment = new SigninFragment();
             FragmentManager manager = getSupportFragmentManager();
@@ -393,13 +444,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         //String knownName = addresses.get(0).getFeatureName();
                         //Toast.makeText(MapActivity.this, state, Toast.LENGTH_SHORT).show();
 
-                        String melakastring = "Malacca";
-                        String melakastrings = "Melaka";
-                        String melakastringss = "Durian Tunggal";
-                        String melakastringsss = "Ayer Keroh";
-                        String melakastringssss = "Alor Gajah";
+                        String hmLocation = "Ayer Keroh";
+                        String hmLocation1 = "Air Keroh";
+                        String hmLocation2 = "Durian Tunggal";
+                        String hmLocation3 = "Lebuh Ayer Keroh";
+                        String hmLocation4 = "Bemban";
 
-                        if (melakastringss.equalsIgnoreCase(city) || melakastringssss.equalsIgnoreCase(city)){
+                        if (hmLocation.equalsIgnoreCase(city) || hmLocation1.equalsIgnoreCase(city) || hmLocation2.equalsIgnoreCase(city) || hmLocation3.equalsIgnoreCase(city) || hmLocation4.equalsIgnoreCase(city)){
                             LatLng location = new LatLng(upload.getLat(),upload.getLang());
                             markerOptions.position(location);
                             markerOptions.title(upload.getHmName());
@@ -459,7 +510,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                         //Toast.makeText(MapActivity.this, PostKey, Toast.LENGTH_SHORT).show();
 
                                         if(a.equalsIgnoreCase(string)){
-                                            Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
+                                            Intent intent = new Intent(MainActivity.this, HomestayDetailsActivity.class);
                                             intent.putExtra("PostKey", PostKey);
                                             startActivity(intent);
                                             return;

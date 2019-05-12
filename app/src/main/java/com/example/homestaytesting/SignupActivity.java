@@ -103,7 +103,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         final String phone = editTextPhone.getText().toString().trim();
         role = radioButtonRolesoption.getText().toString();
         final String profileimages2 = "https://firebasestorage.googleapis.com/v0/b/dreamhome-a806d.appspot.com/o/profile%20Images%2Fnophoto.png?alt=media&token=724e2036-5419-4eef-bbeb-d8b0083ea123";
-        final String profiledescription = "";
+        final String profiledescription = "High-energy Guest Service Representative focused on promoting customer satisfaction through exceptional service and maintaining outstanding homestay accommodations. Highly accurate and efficicent with data entry and general operations.";
         final String devicetoken = FirebaseInstanceId.getInstance().getToken();
 
         if (name.isEmpty()) {
