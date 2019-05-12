@@ -333,29 +333,6 @@
             </android.support.v4.widget.NestedScrollView>
         </FrameLayout>
 
-<!--        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right|bottom"
-            android:layout_margin="@dimen/fab_margin"
-            android:layout_marginBottom="52dp"
-            android:layout_marginRight="16dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:src="@drawable/ic_add_black"/>-->
-
-<!--        <com.getbase.floatingactionbutton.FloatingActionsMenu
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            app:fab_addButtonColorNormal="@color/keppel"
-            app:fab_addButtonColorPressed="@color/keppel"
-            app:fab_addButtonPlusIconColor="@color/black">-->
-
-
-
         <com.getbase.floatingactionbutton.FloatingActionsMenu
             android:id="@+id/fab"
             android:layout_width="wrap_content"
@@ -365,7 +342,6 @@
             android:layout_marginRight="5dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
-            app:layout_behavior="com.example.homestaytesting.ScrollFabBehavior"
             app:fab_addButtonColorNormal="@color/keppel"
             app:fab_addButtonColorPressed="@color/nonphotoblue"
             app:fab_addButtonPlusIconColor="@color/black">

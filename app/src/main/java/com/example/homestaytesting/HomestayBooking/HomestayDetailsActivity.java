@@ -11,6 +11,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
@@ -20,11 +21,14 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -114,6 +118,10 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
     private FloatingActionsMenu fabMenu;
     private FloatingActionButton fAB1, fAB2, fAB3;
 
+    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS =0 ;
+    String phoneNo = "+60197272594";
+    String message = "I have a question for you!";
+
     NestedScrollView nestedScrollView;
     FrameLayout frameLayout;
     CoordinatorLayout rootLayout;
@@ -143,21 +151,30 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         tvFurnish = findViewById(R.id.tvFurnish);
         btnPay = findViewById(R.id.buttonPay);
         btnBook = findViewById(R.id.buttonBook);
-
-/*        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(HomestayDetailsActivity.this, HomestayListingActivity.class);
-                HomestayDetailsActivity.this.startActivity(intent);
-            }
-        });*/
         fabMenu = findViewById(R.id.fab);
         fAB1 = findViewById(R.id.fab1);
         fAB1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(HomestayDetailsActivity.this, "Contact by Email", Toast.LENGTH_SHORT).show();
+                Log.i("Send email", "");
+                String[] TO = {""};
+                String[] CC = {""};
+                Intent emailIntent = new Intent(Intent.ACTION_SEND);
+
+                emailIntent.setData(Uri.parse("mailto:"));
+                emailIntent.setType("text/plain");
+                emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
+                emailIntent.putExtra(Intent.EXTRA_CC, CC);
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Your subject");
+                emailIntent.putExtra(Intent.EXTRA_TEXT, "Email message goes here");
+
+                try {
+                    startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+                    finish();
+                    Log.i("Finished sending email...", "");
+                } catch (android.content.ActivityNotFoundException ex) {
+                    Toast.makeText(HomestayDetailsActivity.this, "There is no email client installed.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -165,7 +182,17 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         fAB2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(HomestayDetailsActivity.this, "Contact by SMS", Toast.LENGTH_SHORT).show();
+                try{
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse("smsto:"));
+                    i.setType("vnd.android-dir/mms-sms");
+                    i.putExtra("address", new String(phoneNo));
+                    i.putExtra("sms_body",message);
+                    startActivity(Intent.createChooser(i, "Send sms via:"));
+                }
+                catch(Exception e){
+                    Toast.makeText(HomestayDetailsActivity.this, "SMS Failed to Send, Please try again", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -173,7 +200,9 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         fAB3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(HomestayDetailsActivity.this, "Contact by Phone", Toast.LENGTH_SHORT).show();
+                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                callIntent.setData(Uri.parse("tel:" + phoneNo));
+                startActivity(callIntent);
             }
         });
 
