@@ -64,5 +64,7 @@ dependencies {
     implementation 'com.github.psinetron:slycalendarview:0.0.9'
 
     implementation 'com.getbase:floatingactionbutton:1.10.1'
-
+    implementation 'com.github.franmontiel:FullScreenDialog:1.0.1'
+    implementation 'com.ms-square:expandableTextView:0.1.4'
+    implementation 'com.alespero:expandable-cardview:0.8'
 }

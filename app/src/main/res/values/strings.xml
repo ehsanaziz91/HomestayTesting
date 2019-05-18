@@ -76,4 +76,29 @@
     <string name="timeFormat" translatable="false">EE, dd MMM HH:mm</string>
     <string name="period" translatable="false">%1$s – %2$s</string>
 
+    <string name="content">Here are some guidelines to follow in this Homestay, as well as other details to know \n
+    - No Smoking \n
+    - No pets \n
+    - No parties or events (Permission) \n
+    - Check-in time is 2PM - 5PM \n
+    - Check out by 12PM(noon) \n
+    - Self check-in with lockbox \n</string>
+
+    <string name="content1">Strict - Free cancellation for 48 hours\n
+        \n
+    After that, cancel up to 7 days before check-in and get a 50% refund, minus the service fee.\n
+        \n
+    Accepted - Reservation confirmed\n
+    \t\t\t\t\t\tFull refund if check-in is at least 14 days away\n
+        \n
+    Warning - 48 hours later\n
+    \t\t\t\t\t\t50% refund, minus the service fee\n
+        \n
+    Danger - 7 days before check-in\n
+    \t\t\t\t\tNo refund\n
+    \t\t\t\t\tCheck-in
+    </string>
+
+    <string name="content2">To protect your payment, never transfer money or communicate outside of the HomestayNearby app</string>
+
 </resources>

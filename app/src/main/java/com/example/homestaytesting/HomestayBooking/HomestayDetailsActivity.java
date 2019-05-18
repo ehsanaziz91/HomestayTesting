@@ -16,6 +16,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
+
+import com.alespero.expandablecardview.ExpandableCardView;
+import com.example.homestaytesting.FragmentTestingActivity;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import android.support.design.widget.NavigationView;
@@ -28,11 +31,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -84,12 +90,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import ru.slybeaver.slycalendarview.SlyCalendarDialog;
+
 public class HomestayDetailsActivity extends AppCompatActivity implements OnMapReadyCallback,
         LocationListener,
         GoogleMap.OnMarkerClickListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        com.google.android.gms.location.LocationListener{
+        com.google.android.gms.location.LocationListener,
+        SlyCalendarDialog.Callback{
 
     private static final String TAG = "Debug";
     private GoogleMap mMap;
@@ -105,16 +114,17 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
     private Toolbar mToolbar;
 
     private StorageReference storageRef;
-    private DatabaseReference databaseRef, databaseReference;
+    private DatabaseReference databaseRef, databaseReference, UserRef;
 
     private FirebaseAuth hmAuth;
     private FirebaseDatabase firebaseDb;
     private String currentUserid, PostKey, imgUrl, hmName, hmLocation, hmPrice, hmDetails, hmContact, hmLat, hmLang, hmId,
-            hmBathroom, hmBedrooms, hmPropertyType, hmFurnish, hmFacilities;
+            hmBathroom, hmBedrooms, hmPropertyType, hmFurnish, hmFacilities, hmFacilities2, hmFacilities3, hmFacilities4, name;
 
     private ImageView imgView;
-    private TextView tvName, tvName1, tvLocation, tvPrice, tvDetails, tvContact, tvBed, tvBath, tvProperty, tvFurnish;
-    private Button btnPay, btnBook;
+    private TextView tvName, tvName1, tvLocation, tvPrice, tvDetails, tvContact, tvBed, tvBath, tvProperty, tvFurnish, tvAc, tvCa, tvInternet, tvWm, tvTotalPrice;
+    private EditText edtTextCalendar,edtTextCalendar1;
+    private Button btnPay, btnAvailability, btnBook;
     private FloatingActionsMenu fabMenu;
     private FloatingActionButton fAB1, fAB2, fAB3;
 
@@ -126,6 +136,11 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
     FrameLayout frameLayout;
     CoordinatorLayout rootLayout;
     BottomNavigationView bottomNavigationView;
+
+    private String firstdate;
+    private String seconddate;
+    private String e;
+    private String paid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,7 +155,7 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
 
         imgView = findViewById(R.id.imgView);
         tvName = findViewById(R.id.tvName);
-        tvName1 = findViewById(R.id.tvName1);
+        //tvName1 = findViewById(R.id.tvName1);
         tvLocation = findViewById(R.id.tvLocation);
         tvPrice = findViewById(R.id.tvPrice);
         tvDetails = findViewById(R.id.tvDetails);
@@ -149,8 +164,17 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         tvBath = findViewById(R.id.tvBath);
         tvProperty = findViewById(R.id.tvProperty);
         tvFurnish = findViewById(R.id.tvFurnish);
+        tvAc = findViewById(R.id.tvAc);
+        tvCa = findViewById(R.id.tvCa);
+        tvInternet = findViewById(R.id.tvInternet);
+        tvWm = findViewById(R.id.tvWm);
+        tvTotalPrice = findViewById(R.id.tvTotalPrice);
+        btnBook = findViewById(R.id.btnBook);
         btnPay = findViewById(R.id.buttonPay);
-        btnBook = findViewById(R.id.buttonBook);
+        btnAvailability = findViewById(R.id.btnAvailability);
+        edtTextCalendar = findViewById(R.id.edtTextCalendar);
+        edtTextCalendar1 = findViewById(R.id.edtTextCalendar1);
+
         fabMenu = findViewById(R.id.fab);
         fAB1 = findViewById(R.id.fab1);
         fAB1.setOnClickListener(new View.OnClickListener() {
@@ -219,6 +243,7 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         currentUserid = hmAuth.getCurrentUser().getUid();
 
         PostKey = getIntent().getExtras().get("PostKey").toString();
+        UserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserid);
         databaseRef = FirebaseDatabase.getInstance().getReference().child("Uploads").child(PostKey);
         databaseReference = FirebaseDatabase.getInstance().getReference("Booking");
 
@@ -265,7 +290,6 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
                     }
 
                     tvName.setText(hmName);
-                    tvName1.setText(hmName);
                     tvLocation.setText(address);
                     tvPrice.setText("RM " + hmPrice + " per night");
                     tvDetails.setText(hmDetails);
@@ -293,8 +317,60 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
             }
         });
 
+        databaseRef.child("hmFacilities").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.child("1").exists()){
+                    tvAc.setVisibility(View.GONE);
+                } else {
+                    hmFacilities = dataSnapshot.child("1").getValue().toString();
+                    tvAc.setText(hmFacilities);
+                }
+
+                if(!dataSnapshot.child("2").exists()){
+                    tvAc.setVisibility(View.GONE);
+                } else {
+                    hmFacilities2 = dataSnapshot.child("2").getValue().toString();
+                    tvCa.setText(hmFacilities2);
+                }
+
+                if(!dataSnapshot.child("3").exists()){
+                    tvInternet.setVisibility(View.GONE);
+                }else {
+                    hmFacilities3 = dataSnapshot.child("3").getValue().toString();
+                    tvInternet.setText(hmFacilities3);
+                }
+
+                if(!dataSnapshot.child("4").exists()){
+                    tvWm.setVisibility(View.GONE);
+                }else{
+                    hmFacilities4 = dataSnapshot.child("4").getValue().toString();
+                    tvWm.setText(hmFacilities4);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        UserRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //name = dataSnapshot.child("name").getValue().toString();
+
+                //tvName.setText(name);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         //PayPal Implementation
-        btnPay.setOnClickListener(new View.OnClickListener() {
+        btnBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 payPalPayment();
@@ -306,7 +382,7 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         startService(intent);
 
         //Book now
-        btnBook.setOnClickListener(new View.OnClickListener() {
+        /*btnAvailability.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent1 = new Intent(HomestayDetailsActivity.this, HomestayBookingActivity.class);
@@ -314,7 +390,22 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
                 startActivity(intent1);
                 return;
             }
+        });*/
+
+        btnAvailability.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new SlyCalendarDialog()
+                        .setSingle(false)
+                        .setFirstMonday(false)
+                        .setCallback(HomestayDetailsActivity.this)
+                        .show(getSupportFragmentManager(), "TAG_SLYCALENDAR");
+            }
         });
+
+        //change button availability to book pyament if date and price are set
+        onButtonChanged();
+
     }
 
     public class BottomNavigationViewBehavior extends CoordinatorLayout.Behavior<BottomNavigationView> {
@@ -409,12 +500,6 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
                         String paymentResponse = jsonObj.getJSONObject("response").getString("state");
 
                         if (paymentResponse.equals("approved")){
-                            Toast.makeText(getApplicationContext(), "Payment Successful", Toast.LENGTH_LONG).show();
-
-                            HashMap payment = new HashMap();
-
-                            payment.put("hmName", hmName);
-                            payment.put("bookPayment", true);
 
                             Calendar calFordDate = Calendar.getInstance();
                             SimpleDateFormat currentDate = new SimpleDateFormat("dd-MMMM-yyyy");
@@ -424,9 +509,21 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
                             SimpleDateFormat currentTime = new SimpleDateFormat("HH:mm:ss");
                             String saveCurrentTime = currentTime.format(calFordTime.getTime());
 
-                            String postRandomName = saveCurrentDate + saveCurrentTime;
+                            String postRandomName = saveCurrentDate + " " +saveCurrentTime;
+
+                            HashMap payment = new HashMap();
+
+                            payment.put("uid", currentUserid);
+                            //payment.put("custName", name);
+                            payment.put("hmName", hmName);
+                            //payment.put("bookPayment", true);
+                            //payment.put("totalPrice", e);
+                            //payment.put("bookDate", edtTextCalendar);
+                            payment.put("paymentDate", postRandomName);
 
                             databaseReference.child(currentUserid + postRandomName).setValue(payment);
+
+                            Toast.makeText(getApplicationContext(), "Payment Successful", Toast.LENGTH_LONG).show();
                         }
                     }catch (JSONException e){
                         e.printStackTrace();
@@ -519,7 +616,7 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        mMap.setMyLocationEnabled(true);
+        mMap.setMyLocationEnabled(false);
 
 /*        DatabaseReference UsersRef = FirebaseDatabase.getInstance().getReference();
         final DatabaseReference Postsref = UsersRef.child("Uploads");
@@ -670,5 +767,76 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+    //public class for set date range
+    @Override
+    public void onCancelled() {
+        //Nothing
+    }
+
+    @Override
+    public void onDataSelected(Calendar firstDate, Calendar secondDate, int hours, int minutes) {
+        if (firstDate != null) {
+            if (secondDate == null) {
+                firstDate.set(Calendar.HOUR_OF_DAY, hours);
+                firstDate.set(Calendar.MINUTE, minutes);
+
+                firstdate = new SimpleDateFormat(getString(R.string.dateFormat), Locale.getDefault()).format(firstDate.getTime());
+                //String seconddate = new SimpleDateFormat(getString(R.string.dateFormat), Locale.getDefault()).format(secondDate.getTime());
+                //String thirddatetime = new SimpleDateFormat(getString(R.string.timeFormat), Locale.getDefault()).format(secondDate.getTime());
+
+                edtTextCalendar.setText(firstdate);
+
+            } else {
+
+                firstdate = new SimpleDateFormat(getString(R.string.dateFormat), Locale.getDefault()).format(firstDate.getTime());
+                seconddate = new SimpleDateFormat(getString(R.string.dateFormat), Locale.getDefault()).format(secondDate.getTime());
+                //String thirddatetime = new SimpleDateFormat(getString(R.string.timeFormat), Locale.getDefault()).format(secondDate.getTime());
+
+                String a = firstdate.replaceAll("\\D+","");
+                String b = seconddate.replaceAll("\\D+","");
+
+                edtTextCalendar.setText(firstdate + " - " + seconddate);
+
+                //check edtText then pergi method buttonchange
+                edtTextCalendar1.setText(firstdate + " - " + seconddate);
+
+                String price = hmPrice;
+
+                double c = Double.parseDouble(b) - Double.parseDouble(a);
+                double hmPrice = Double.parseDouble(price);
+                double d = c * hmPrice;
+                e = String.valueOf(d);
+
+                tvTotalPrice.setText("RM "+e+"0");
+
+                //Toast.makeText(HomestayBookingActivity.this, e, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    //button change when user set date and price
+    private void onButtonChanged() {
+
+        edtTextCalendar1 = new EditText(this);
+        edtTextCalendar1.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                btnBook.setVisibility(View.VISIBLE);
+                btnAvailability.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 }

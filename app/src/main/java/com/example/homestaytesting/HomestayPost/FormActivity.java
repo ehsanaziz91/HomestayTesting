@@ -111,7 +111,7 @@ public class FormActivity extends AppCompatActivity implements AdapterView.OnIte
         editTextDetails = (EditText) findViewById(R.id.editTextDetails);
         editTextPrice = (EditText) findViewById(R.id.editTextPrice);
         editTextContact = (EditText) findViewById(R.id.editTextContact);
-        btnSubmit = (Button) findViewById(R.id.btnSubmit);
+        btnSubmit = findViewById(R.id.btnSubmit);
         msPropertyType = findViewById(R.id.msPropertyType);
         msBedrooms = findViewById(R.id.msBedrooms);
         msBathroom = findViewById(R.id.msBathroom);

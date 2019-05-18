@@ -22,6 +22,13 @@ import android.widget.TextView;
 
 import com.example.homestaytesting.Modal.Upload;
 import com.example.homestaytesting.R;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,19 +38,23 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PostUpdateActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private Toolbar mToolbar;
 
+    private static final String TAG = "Debug";
     private DatabaseReference databaseRef;
     private FirebaseAuth hmAuth;
-    private String currentUserid, PostKey, hmFurnish;
+    private String currentUserid, PostKey, hmFurnish, hmFacility;
 
     private ImageView imgView;
-    private EditText editTextName, editTextDetails, editTextLocation, editTextPrice, editTextContact;
+    private TextView tvPic, tvDetails, tvLocation, tvLat, tvLang;
+    private EditText editTextName, editTextDetails, editTextPrice, editTextContact;
     private Spinner msPropertyType, msBedrooms, msBathroom;
+    private Button btnUpdate;
     private RadioGroup rgFurnished;
     private RadioButton rbFurnished, rbFully, rbPartially;
     private CheckBox cbFirst, cbSecond, cbThird, cbFourth;
@@ -57,7 +68,7 @@ public class PostUpdateActivity extends AppCompatActivity implements View.OnClic
 
         mToolbar = (Toolbar) findViewById(R.id.find_toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("Update Homestay Details");
+        getSupportActionBar().setTitle("Update Homestay Information");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
@@ -65,9 +76,11 @@ public class PostUpdateActivity extends AppCompatActivity implements View.OnClic
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         imgView = findViewById(R.id.imgView);
+        tvLocation = findViewById(R.id.tvLocation);
+        tvLat = findViewById(R.id.tvLat);
+        tvLang = findViewById(R.id.tvLang);
         editTextName = findViewById(R.id.editTextName);
         editTextDetails = findViewById(R.id.editTextDetails);
-        editTextLocation = findViewById(R.id.editTextLocation);
         editTextPrice = findViewById(R.id.editTextPrice);
         editTextContact = findViewById(R.id.editTextContact);
         msPropertyType = findViewById(R.id.msPropertyType);
@@ -110,6 +123,48 @@ public class PostUpdateActivity extends AppCompatActivity implements View.OnClic
         msPropertyType.setAdapter(adapterProperty);
         msPropertyType.setOnItemSelectedListener(this);
 
+        //testing lat lang
+        tvLat = findViewById(R.id.tvLat);
+        tvLat.setVisibility(EditText.GONE);
+        tvLang = findViewById(R.id.tvLang);
+        tvLang.setVisibility(EditText.GONE);
+
+        //txtView = findViewById(R.id.tvLocation);
+
+        // Initialize Places.
+        Places.initialize(getApplicationContext(), "AIzaSyAWali3rmbAHlOWE2eS7J4yhKBThZD31IA");
+        // Create a new Places client instance.
+        PlacesClient placesClient = Places.createClient(this);
+
+        // Initialize the AutocompleteSupportFragment.
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG));
+
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+                // TODO: Get info about the selected place.
+                //txtView.setText(place.getName()+","+place.getAddress()+","+place.getId());
+                tvLocation.setText(String.format(place.getAddress()));
+                Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
+                LatLng queriedLocation = place.getLatLng();
+                Log.v("Latitude is", "" + queriedLocation.latitude);
+                Log.v("Longitude is", "" + queriedLocation.longitude);
+                tvLat.setText(String.format("" + queriedLocation.latitude));
+                tvLang.setText(String.format("" + queriedLocation.longitude));
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
+                // TODO: Handle the error.
+                Log.i(TAG, "An error occurred: " + status);
+            }
+        });
+
         findViewById(R.id.btnUpdate).setOnClickListener(this);
 
         hmAuth = FirebaseAuth.getInstance();
@@ -126,6 +181,8 @@ public class PostUpdateActivity extends AppCompatActivity implements View.OnClic
                     String hmName = dataSnapshot.child("hmName").getValue().toString();
                     String hmDetails = dataSnapshot.child("hmDetails").getValue().toString();
                     String hmLocation = dataSnapshot.child("hmLocation").getValue().toString();
+                    String lat = dataSnapshot.child("lat").getValue().toString();
+                    String lang = dataSnapshot.child("lang").getValue().toString();
                     String hmPrice = dataSnapshot.child("hmPrice").getValue().toString();
                     String hmContact = dataSnapshot.child("hmContact").getValue().toString();
                     String hmFurnish = dataSnapshot.child("hmFurnish").getValue().toString();
@@ -149,9 +206,11 @@ public class PostUpdateActivity extends AppCompatActivity implements View.OnClic
 
                     editTextName.setText(hmName);
                     editTextDetails.setText(hmDetails);
-                    editTextLocation.setText(hmLocation);
                     editTextPrice.setText(hmPrice);
                     editTextContact.setText(hmContact);
+                    tvLocation.setText(hmLocation);
+                    tvLat.setText(lat);
+                    tvLang.setText(lang);
 
                     //radio button
                     if(hmFurnish.equalsIgnoreCase("Fully Furnished"))
@@ -168,7 +227,7 @@ public class PostUpdateActivity extends AppCompatActivity implements View.OnClic
                     {
                         cbFirst.setChecked(true);
                     }
-                    if(hmFacility.equals("Cooking Allowed"))
+                    if(cbSecond.isChecked())
                     {
                         cbSecond.setChecked(true);
                     }

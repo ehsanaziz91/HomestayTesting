@@ -103,6 +103,12 @@
                 android:background="@drawable/img_rectangle_border"/>
         </LinearLayout>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </RelativeLayout>
+
 <!--        <View android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_marginTop="10dp"
