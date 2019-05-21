@@ -2,7 +2,9 @@ package com.example.homestaytesting.HomestayBooking;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -119,7 +121,7 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
     private FirebaseAuth hmAuth;
     private FirebaseDatabase firebaseDb;
     private String currentUserid, PostKey, imgUrl, hmName, hmLocation, hmPrice, hmDetails, hmContact, hmLat, hmLang, hmId,
-            hmBathroom, hmBedrooms, hmPropertyType, hmFurnish, hmFacilities, hmFacilities2, hmFacilities3, hmFacilities4, name;
+            hmBathroom, hmBedrooms, hmPropertyType, hmFurnish, hmFacilities, hmFacilities2, hmFacilities3, hmFacilities4, name, phone, email;
 
     private ImageView imgView;
     private TextView tvName, tvName1, tvLocation, tvPrice, tvDetails, tvContact, tvBed, tvBath, tvProperty, tvFurnish, tvAc, tvCa, tvInternet, tvWm, tvTotalPrice;
@@ -140,7 +142,7 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
     private String firstdate;
     private String seconddate;
     private String e;
-    private String paid;
+    private String dateRange;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,7 +172,7 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         tvWm = findViewById(R.id.tvWm);
         tvTotalPrice = findViewById(R.id.tvTotalPrice);
         btnBook = findViewById(R.id.btnBook);
-        btnPay = findViewById(R.id.buttonPay);
+        //btnPay = findViewById(R.id.buttonPay);
         btnAvailability = findViewById(R.id.btnAvailability);
         edtTextCalendar = findViewById(R.id.edtTextCalendar);
         edtTextCalendar1 = findViewById(R.id.edtTextCalendar1);
@@ -358,9 +360,9 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         UserRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                //name = dataSnapshot.child("name").getValue().toString();
-
-                //tvName.setText(name);
+                name = dataSnapshot.child("name").getValue().toString();
+                email = dataSnapshot.child("email").getValue().toString();
+                phone = dataSnapshot.child("phone").getValue().toString();
             }
 
             @Override
@@ -368,6 +370,8 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
 
             }
         });
+
+
 
         //PayPal Implementation
         btnBook.setOnClickListener(new View.OnClickListener() {
@@ -514,16 +518,49 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
                             HashMap payment = new HashMap();
 
                             payment.put("uid", currentUserid);
-                            //payment.put("custName", name);
+                            payment.put("userName", name);
+                            payment.put("userEmail", email);
+                            payment.put("userContact", phone);
+                            payment.put("hmId", hmId);
                             payment.put("hmName", hmName);
-                            //payment.put("bookPayment", true);
-                            //payment.put("totalPrice", e);
-                            //payment.put("bookDate", edtTextCalendar);
+                            payment.put("totalPrice", e);
+                            payment.put("bookDate", dateRange);
                             payment.put("paymentDate", postRandomName);
 
                             databaseReference.child(currentUserid + postRandomName).setValue(payment);
 
-                            Toast.makeText(getApplicationContext(), "Payment Successful", Toast.LENGTH_LONG).show();
+                            //Toast.makeText(getApplicationContext(), "Payment Successful", Toast.LENGTH_LONG).show();
+
+                            /*AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                            builder.setMessage("Payment Successful ! Close...")
+                                    .setCancelable(false)
+                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            finish();
+                                        }
+                                    })
+                                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.cancel();
+                                        }
+                                    });
+                            AlertDialog alertDialog = builder.create();
+                            alertDialog.setTitle("Alert !!!");
+                            alertDialog.show();*/
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+                            builder.setTitle("AlertDialog with No Buttons");
+
+                            builder.setMessage("Hello, you can hide this message by just tapping anywhere outside the dialog box!");
+
+
+                            AlertDialog diag = builder.create();
+
+                            //Display the message!
+                            diag.show();
                         }
                     }catch (JSONException e){
                         e.printStackTrace();
@@ -798,6 +835,8 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
                 String b = seconddate.replaceAll("\\D+","");
 
                 edtTextCalendar.setText(firstdate + " - " + seconddate);
+
+                dateRange = (firstdate+" - "+seconddate);
 
                 //check edtText then pergi method buttonchange
                 edtTextCalendar1.setText(firstdate + " - " + seconddate);
