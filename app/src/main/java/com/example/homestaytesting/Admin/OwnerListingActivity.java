@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.homestaytesting.HomestayPost.PostDetailsActivity;
 import com.example.homestaytesting.HomestayPost.PostListingActivity;
@@ -46,7 +47,7 @@ public class OwnerListingActivity extends AppCompatActivity {
 
         mToolbar = (Toolbar) findViewById(R.id.find_toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("My Homestays");
+        getSupportActionBar().setTitle("List of Owner's");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
@@ -76,9 +77,6 @@ public class OwnerListingActivity extends AppCompatActivity {
 
     private void SendUserToMainActivity()
     {
-        Intent mainIntent = new Intent(OwnerListingActivity.this, Main2Activity.class);
-        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(mainIntent);
         finish();
     }
 
@@ -115,8 +113,9 @@ public class OwnerListingActivity extends AppCompatActivity {
                         // Untuk dpat Id dalam table post
                         //String PostKey = getSnapshots().getSnapshot(position).getKey();
 
-                        Intent click_post = new Intent(OwnerListingActivity.this, PostDetailsActivity.class);
+                        Intent click_post = new Intent(OwnerListingActivity.this, OwnerHomestayActivity.class);
                         click_post.putExtra("PostKey", PostKey);
+                        //Toast.makeText(getBaseContext(), "Location changed : Lat: " + PostKey, Toast.LENGTH_SHORT).show();
                         startActivity(click_post);
                     }
                 });
@@ -124,7 +123,7 @@ public class OwnerListingActivity extends AppCompatActivity {
                 holder.userHome.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(OwnerListingActivity.this, PostUpdateActivity.class);
+                        Intent intent = new Intent(OwnerListingActivity.this, OwnerHomestayActivity.class);
                         intent.putExtra("PostKey", PostKey);
                         startActivity(intent);
                     }

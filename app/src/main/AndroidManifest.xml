@@ -31,7 +31,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Admin.AnalysisActivity"></activity>
+        <activity android:name=".Admin.AdminHomestayStateActivity"></activity>
+        <activity android:name=".Admin.AdminHomestayListingActivity" />
+        <activity android:name=".Admin.OwnerHomestayDetailsActivity" />
+        <activity android:name=".Admin.OwnerHomestayActivity" />
+        <activity android:name=".Admin.AnalysisActivity" />
         <activity android:name=".Admin.OwnerListingActivity" />
         <activity android:name=".UserProfile2Activity" />
         <activity android:name=".OwnerHomestay.OwnerListingActivity" />

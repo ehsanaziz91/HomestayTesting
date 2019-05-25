@@ -236,10 +236,8 @@ public class FormActivity extends AppCompatActivity implements AdapterView.OnIte
         return super.onOptionsItemSelected(item);
     }
 
-    private void SendUserToMainActivity() {
-        Intent mainIntent = new Intent(FormActivity.this, Main2Activity.class);
-        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(mainIntent);
+    private void SendUserToMainActivity()
+    {
         finish();
     }
 

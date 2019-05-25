@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.homestaytesting.Admin.AdminHomestayStateActivity;
 import com.example.homestaytesting.Admin.AnalysisActivity;
 import com.example.homestaytesting.Admin.OwnerListingActivity;
 import com.example.homestaytesting.HomestayPost.FormActivity;
@@ -176,7 +177,7 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
                 startActivity(new Intent(this, Main2Activity.class));
                 break;
             case R.id.L6:
-                startActivity(new Intent(this, Main2Activity.class));
+                startActivity(new Intent(this, AdminHomestayStateActivity.class));
                 break;
             case R.id.L7:
                 startActivity(new Intent(this, OwnerListingActivity.class));

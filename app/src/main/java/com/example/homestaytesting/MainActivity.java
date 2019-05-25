@@ -282,14 +282,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             finish();
 
         } else if (id == R.id.nav_booking) {
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+/*            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
-            finish();
+            finish();*/
 
         } else if (id == R.id.nav_favourite) {
-            Intent intent = new Intent(MainActivity.this, FormActivity.class);
+/*            Intent intent = new Intent(MainActivity.this, FormActivity.class);
             startActivity(intent);
-            finish();
+            finish();*/
 
         } else if (id == R.id.nav_history) {
 /*            Intent intent = new Intent(MainActivity.this, BottomNavigationActivity.class);
@@ -298,9 +298,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         }else if (id == R.id.nav_aboutus) {
 
-            Intent intent = new Intent(MainActivity.this, ToolbarTestingActivity.class);
+/*            Intent intent = new Intent(MainActivity.this, ToolbarTestingActivity.class);
             startActivity(intent);
-            finish();
+            finish();*/
 
 /*            SigninFragment signinFragment = new SigninFragment();
             FragmentManager manager = getSupportFragmentManager();

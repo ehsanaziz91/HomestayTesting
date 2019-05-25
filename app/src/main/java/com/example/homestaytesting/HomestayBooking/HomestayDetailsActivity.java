@@ -469,9 +469,6 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
 
     private void SendUserToMainActivity()
     {
-        Intent mainIntent = new Intent(HomestayDetailsActivity.this, HomestayListingActivity.class);
-        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(mainIntent);
         finish();
     }
 
