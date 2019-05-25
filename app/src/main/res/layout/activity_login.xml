@@ -19,7 +19,6 @@
         android:layout_weight="1"
         android:background="@color/white">
 
-
         <ImageView
             android:id="@+id/loginlogo"
             android:layout_width="170dp"

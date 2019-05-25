@@ -4,20 +4,27 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.homestaytesting.Admin.AnalysisActivity;
+import com.example.homestaytesting.Admin.OwnerListingActivity;
 import com.example.homestaytesting.HomestayPost.FormActivity;
 import com.example.homestaytesting.HomestayPost.PostListingActivity;
+import com.example.homestaytesting.Modal.User;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
@@ -30,7 +37,7 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
     private FirebaseAuth hmAuth;
     private String currentUserid;
 
-    private LinearLayout L1;
+    private LinearLayout linearVisible1, linearVisible2, linearVisible3, linearVisible4;
 
     //private ImageView imgView;
     private TextView tvName, tvEmail;
@@ -50,12 +57,21 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
         currentUserid = hmAuth.getCurrentUser().getUid();
         databaseRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserid);
 
+        if(hmAuth.getCurrentUser() !=null)
+        {
+            DetermineRole();
+        }
+
         // Code gambar
         UserProfileImageRef = FirebaseStorage.getInstance().getReference().child("Uploads");
         circleImage = findViewById(R.id.imgView);
 
         tvName = findViewById(R.id.tvName);
         tvEmail = findViewById(R.id.tvEmail);
+        linearVisible1 = findViewById(R.id.linearVisible1);
+        linearVisible2 = findViewById(R.id.linearVisible2);
+        linearVisible3 = findViewById(R.id.linearVisible3);
+        linearVisible4 = findViewById(R.id.linearVisible4);
 
         findViewById(R.id.L1).setOnClickListener(this);
         findViewById(R.id.L2).setOnClickListener(this);
@@ -63,6 +79,10 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
         findViewById(R.id.L4).setOnClickListener(this);
         findViewById(R.id.L5).setOnClickListener(this);
         findViewById(R.id.L6).setOnClickListener(this);
+        findViewById(R.id.L7).setOnClickListener(this);
+        findViewById(R.id.L8).setOnClickListener(this);
+        findViewById(R.id.L9).setOnClickListener(this);
+        findViewById(R.id.L10).setOnClickListener(this);
 
         databaseRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -94,11 +114,54 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
         });
     }
 
+    public void DetermineRole(){
+        final FirebaseUser user = hmAuth.getCurrentUser();
+        final String uid = user.getUid();
+        final String deviceToken = FirebaseInstanceId.getInstance().getToken();
+
+        //replace noti when tukar device
+        //UserRef.child(uid).child("devicetoken").setValue(deviceToken);
+
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        DatabaseReference xx = db.getReference();
+
+/*        Intent intent = new Intent(LoginActivity.this, SplashScreenActivity.class);
+        startActivity(intent);
+        finish();*/
+
+        xx.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+            {
+                if(dataSnapshot.exists())
+                {
+                    User usersData = dataSnapshot.child("Users").child(uid).getValue(User.class);
+
+                    if(usersData.getRole().equals("Owner"))
+                    {
+                        linearVisible3.setVisibility(View.GONE);
+                        linearVisible4.setVisibility(View.GONE);
+                    }
+                    else {
+                        linearVisible1.setVisibility(View.GONE);
+                        linearVisible2.setVisibility(View.GONE);
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.L1:
-                startActivity(new Intent(this, UserProfileActivity.class));
+                startActivity(new Intent(this, Main2Activity.class));
                 break;
             case R.id.L2:
                 startActivity(new Intent(this, PostListingActivity.class));
@@ -107,12 +170,24 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
                 startActivity(new Intent(this, FormActivity.class));
                 break;
             case R.id.L4:
-                startActivity(new Intent(this, FormActivity.class));
+                startActivity(new Intent(this, Main2Activity.class));
                 break;
             case R.id.L5:
-                startActivity(new Intent(this, FormActivity.class));
+                startActivity(new Intent(this, Main2Activity.class));
                 break;
             case R.id.L6:
+                startActivity(new Intent(this, Main2Activity.class));
+                break;
+            case R.id.L7:
+                startActivity(new Intent(this, OwnerListingActivity.class));
+                break;
+            case R.id.L8:
+                startActivity(new Intent(this, AnalysisActivity.class));
+                break;
+            case R.id.L9:
+                startActivity(new Intent(this, UserProfile2Activity.class));
+                break;
+            case R.id.L10:
                 logout();
                 break;
         }

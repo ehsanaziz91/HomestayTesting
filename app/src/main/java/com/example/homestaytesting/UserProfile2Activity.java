@@ -6,17 +6,14 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.Layout;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.homestaytesting.HomestayPost.PostDetailsActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -38,7 +35,7 @@ import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class UserProfileActivity extends AppCompatActivity implements View.OnClickListener {
+public class UserProfile2Activity extends AppCompatActivity implements View.OnClickListener {
 
     private Toolbar mToolbar;
 
@@ -58,7 +55,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_profile);
+        setContentView(R.layout.activity_user_profile2);
 
         mToolbar = (Toolbar) findViewById(R.id.find_toolbar);
         setSupportActionBar(mToolbar);
@@ -119,7 +116,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
                     String image = dataSnapshot.child("profileimage2").getValue().toString();
-                    Picasso.with(UserProfileActivity.this)
+                    Picasso.with(UserProfile2Activity.this)
                             .load(image)
                             .fit()
                             .centerCrop()
@@ -152,7 +149,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         final FirebaseUser user = hmAuth.getCurrentUser();
         String uid = user.getUid();
 
-        Intent intent = new Intent(UserProfileActivity.this, MainActivity.class);
+        Intent intent = new Intent(UserProfile2Activity.this, Main2Activity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
@@ -179,10 +176,10 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 
         if(requestCode==CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
-            Toast.makeText(UserProfileActivity.this, "enter request code", Toast.LENGTH_LONG).show();
+            Toast.makeText(UserProfile2Activity.this, "enter request code", Toast.LENGTH_LONG).show();
 
             if (resultCode == RESULT_OK) {
-                Toast.makeText(UserProfileActivity.this, "enter result", Toast.LENGTH_LONG).show();
+                Toast.makeText(UserProfile2Activity.this, "enter result", Toast.LENGTH_LONG).show();
                 Uri resultUri = result.getUri();
 
                 final StorageReference filePath = UserProfileImageRef.child(currentUserid + ".jpg");
@@ -206,7 +203,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                                     String uriurl = uri.toString();
                                     Log.i("uri", uri.toString());
 
-                                    Toast.makeText(UserProfileActivity.this, "Your Image Successfully Uploaded ", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(UserProfile2Activity.this, "Your Image Successfully Uploaded ", Toast.LENGTH_SHORT).show();
 
                                     HashMap userMap = new HashMap();
                                     userMap.put("profileimage2", uriurl);
@@ -217,14 +214,14 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                                         @Override
                                         public void onComplete(@NonNull Task task) {
                                             if (task.isSuccessful()) {
-                                                Toast.makeText(UserProfileActivity.this, "Link update successfully ", Toast.LENGTH_SHORT).show();
-                                                Intent selfIntent = new Intent(UserProfileActivity.this, UserProfileActivity.class);
+                                                Toast.makeText(UserProfile2Activity.this, "Link update successfully ", Toast.LENGTH_SHORT).show();
+                                                Intent selfIntent = new Intent(UserProfile2Activity.this, UserProfile2Activity.class);
                                                 startActivity(selfIntent);
-                                                Toast.makeText(UserProfileActivity.this, "Profile Image store into database are success", Toast.LENGTH_LONG).show();
+                                                Toast.makeText(UserProfile2Activity.this, "Profile Image store into database are success", Toast.LENGTH_LONG).show();
                                             } else {
-                                                Toast.makeText(UserProfileActivity.this, "update image link error ", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(UserProfile2Activity.this, "update image link error ", Toast.LENGTH_SHORT).show();
                                                 String message = task.getException().getMessage();
-                                                Toast.makeText(UserProfileActivity.this, "Error Occured" + message, Toast.LENGTH_LONG).show();
+                                                Toast.makeText(UserProfile2Activity.this, "Error Occured" + message, Toast.LENGTH_LONG).show();
                                             }
                                         }
                                     });
@@ -235,7 +232,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 });
 
             } else {
-                Toast.makeText(UserProfileActivity.this, "Error Occured: Image cant be crop, try again", Toast.LENGTH_LONG).show();
+                Toast.makeText(UserProfile2Activity.this, "Error Occured: Image cant be crop, try again", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -271,11 +268,11 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
             public void onComplete(@NonNull Task task) {
                 if(task.isSuccessful()){
                     SendUserToMainActivity();
-                    Toast.makeText(UserProfileActivity.this, "Profile update successfully",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserProfile2Activity.this, "Profile update successfully",Toast.LENGTH_SHORT).show();
                     SendUserToMainActivity();
                 }
                 else{
-                    Toast.makeText(UserProfileActivity.this, "An error on profile update, please try again!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserProfile2Activity.this, "An error on profile update, please try again!", Toast.LENGTH_SHORT).show();
                 }
             }
         });

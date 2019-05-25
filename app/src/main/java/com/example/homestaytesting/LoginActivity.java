@@ -176,7 +176,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                     }
                     else {
-                        Intent intent = new Intent(LoginActivity.this, Main3Activity.class);
+                        Intent intent = new Intent(LoginActivity.this, Main2Activity.class);
                         startActivity(intent);
                         finish();
                     }
