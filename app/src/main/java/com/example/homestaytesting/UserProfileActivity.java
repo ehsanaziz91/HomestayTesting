@@ -148,13 +148,13 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 
     private void SendUserToMainActivity()
     {
-        hmAuth = FirebaseAuth.getInstance();
+/*        hmAuth = FirebaseAuth.getInstance();
         final FirebaseUser user = hmAuth.getCurrentUser();
         String uid = user.getUid();
 
         Intent intent = new Intent(UserProfileActivity.this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
+        startActivity(intent);*/
         finish();
     }
 

@@ -19,8 +19,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
 
-import com.alespero.expandablecardview.ExpandableCardView;
-import com.example.homestaytesting.FragmentTestingActivity;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import android.support.design.widget.NavigationView;
@@ -28,6 +26,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -39,11 +38,13 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -66,6 +67,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -87,6 +90,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -100,7 +104,7 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         com.google.android.gms.location.LocationListener,
-        SlyCalendarDialog.Callback{
+        SlyCalendarDialog.Callback {
 
     private static final String TAG = "Debug";
     private GoogleMap mMap;
@@ -116,17 +120,17 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
     private Toolbar mToolbar;
 
     private StorageReference storageRef;
-    private DatabaseReference databaseRef, databaseReference, UserRef;
+    private DatabaseReference databaseRef, databaseReference, UserRef, dbRef;
 
     private FirebaseAuth hmAuth;
     private FirebaseDatabase firebaseDb;
     private String currentUserid, PostKey, imgUrl, hmName, hmLocation, hmPrice, hmDetails, hmContact, hmLat, hmLang, hmId,
-            hmBathroom, hmBedrooms, hmPropertyType, hmFurnish, hmFacilities, hmFacilities2, hmFacilities3, hmFacilities4, name, phone, email;
+            hmBathroom, hmBedrooms, hmPropertyType, hmFurnish, hmFacilities, hmFacilities2, hmFacilities3, hmFacilities4, name, phone, email, uid, hmReview;
 
     private ImageView imgView;
-    private TextView tvName, tvName1, tvLocation, tvPrice, tvDetails, tvContact, tvBed, tvBath, tvProperty, tvFurnish, tvAc, tvCa, tvInternet, tvWm, tvTotalPrice;
-    private EditText edtTextCalendar,edtTextCalendar1;
-    private Button btnPay, btnAvailability, btnBook;
+    private TextView tvName, tvName1, tvLocation, tvPrice, tvDetails, tvContact, tvBed, tvBath, tvProperty, tvFurnish, tvAc, tvCa, tvInternet, tvWm, tvTotalPrice, tvReview;
+    private EditText edtTextCalendar,edtTextCalendar1, editTextReviews;
+    private Button btnPay, btnAvailability, btnBook, btnSubmit;
     private FloatingActionsMenu fabMenu;
     private FloatingActionButton fAB1, fAB2, fAB3;
 
@@ -143,6 +147,8 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
     private String seconddate;
     private String e;
     private String dateRange;
+
+    private RatingBar rating, ratings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,6 +182,23 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         btnAvailability = findViewById(R.id.btnAvailability);
         edtTextCalendar = findViewById(R.id.edtTextCalendar);
         edtTextCalendar1 = findViewById(R.id.edtTextCalendar1);
+
+        // ratings and review
+        rating = findViewById(R.id.rating);
+        tvReview = findViewById(R.id.tvReview);
+        ratings = findViewById(R.id.ratings);
+        editTextReviews = findViewById(R.id.editTextReviews);
+        btnSubmit = findViewById(R.id.btnSubmit);
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String totalStars = "Total Stars:: " + ratings.getNumStars();
+                String rating = "Rating :: " + ratings.getRating();
+                String review = "Review :: " + editTextReviews.getText();
+                //Toast.makeText(getApplicationContext(), totalStars + "\n" + rating + "\n" + review, Toast.LENGTH_LONG).show();
+                ratingreviewsubmit();
+            }
+        });
 
         fabMenu = findViewById(R.id.fab);
         fAB1 = findViewById(R.id.fab1);
@@ -248,6 +271,7 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         UserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserid);
         databaseRef = FirebaseDatabase.getInstance().getReference().child("Uploads").child(PostKey);
         databaseReference = FirebaseDatabase.getInstance().getReference("Booking");
+        dbRef = FirebaseDatabase.getInstance().getReference("Ratings&Reviews");
 
         databaseRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -264,6 +288,7 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
                     hmLat = dataSnapshot.child("lat").getValue().toString();
                     hmLang = dataSnapshot.child("lang").getValue().toString();
                     hmId = dataSnapshot.child("hmId").getValue().toString();
+                    uid = dataSnapshot.child("uid").getValue().toString();
 
                     hmBathroom = dataSnapshot.child("hmBathroom").getValue().toString();
                     hmBedrooms = dataSnapshot.child("hmBedrooms").getValue().toString();
@@ -371,8 +396,6 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
             }
         });
 
-
-
         //PayPal Implementation
         btnBook.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -410,6 +433,167 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         //change button availability to book pyament if date and price are set
         onButtonChanged();
 
+        //retrieve the rating and review
+        databaseRef.child("hmRatings").child(currentUserid).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot != null && dataSnapshot.getValue() != null) {
+                    float ratings = Float.parseFloat(dataSnapshot.getValue().toString());
+                    rating.setRating(ratings);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        databaseRef.child("hmReviews").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                hmReview = dataSnapshot.child(currentUserid).getValue().toString();
+                tvReview.setText(hmReview);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+/*        databaseRef.child("hmReviews").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                int sum = 0;
+                for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                    int size = (int) ds.getChildrenCount();
+                    //int value = ds.getValue(Integer.class);
+                    Log.e(ds.getKey(),ds.getChildrenCount() + "");
+                    sum =+ sum + size;
+                }
+
+                String a = String.valueOf(sum);
+                Toast.makeText(HomestayDetailsActivity.this,a,Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });*/
+    }
+
+    private void ratingreviewsubmit() {
+        Float rat = ratings.getRating();
+        String review = editTextReviews.getText().toString();
+        ratingreviewsubmits(rat, review);
+    }
+
+    private void ratingreviewsubmits(Float rat, String review) {
+        rat = ratings.getRating();
+        review = editTextReviews.getText().toString();
+
+        HashMap ratreview = new HashMap();
+        ratreview.put("rating", rat);
+        ratreview.put("review", review);
+        ratreview.put("hmID", hmId);
+
+        dbRef.child(currentUserid).setValue(ratreview).addOnCompleteListener(new OnCompleteListener() {
+            @Override
+            public void onComplete(@NonNull Task task) {
+                if(task.isSuccessful()){
+                    Toast.makeText(HomestayDetailsActivity.this, "Successfully send your feedback",Toast.LENGTH_SHORT).show();
+                    //submitRating();
+                }
+                else{
+                    Toast.makeText(HomestayDetailsActivity.this, "An error on insert your feedback, please try again!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        databaseRef.child("hmRatings").child(currentUserid).setValue(rat).addOnCompleteListener(new OnCompleteListener() {
+            @Override
+            public void onComplete(@NonNull Task task) {
+                if(task.isSuccessful()){
+                    Toast.makeText(HomestayDetailsActivity.this, "Successfully send your feedback",Toast.LENGTH_SHORT).show();
+                    //submitRating();
+                }
+                else{
+                    Toast.makeText(HomestayDetailsActivity.this, "An error on insert your feedback, please try again!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        databaseRef.child("hmReviews").child(currentUserid).setValue(review).addOnCompleteListener(new OnCompleteListener() {
+            @Override
+            public void onComplete(@NonNull Task task) {
+                if(task.isSuccessful()){
+                    Toast.makeText(HomestayDetailsActivity.this, "Successfully send your feedback",Toast.LENGTH_SHORT).show();
+                    submitRating();
+                }
+                else{
+                    Toast.makeText(HomestayDetailsActivity.this, "An error on insert your feedback, please try again!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    public void submitRating() {
+        try {
+            databaseRef.child("hmRatings").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    double total = 0.0;
+                    double count = 0.0;
+                    double average = 0.0;
+
+                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                        double rating = ds.getValue(Double.class);
+                        total = total + rating;
+                        count = count + 1;
+                        average = total / count;
+
+                        String a = String.valueOf(average);
+                        Toast.makeText(HomestayDetailsActivity.this,"Ratings Average ::" + a,Toast.LENGTH_SHORT).show();
+                    }
+
+                    final DatabaseReference newRef = databaseRef.child("hmRatings");
+                    newRef.child("Average").setValue(average);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    throw databaseError.toException();
+                }
+            });
+
+/*            databaseRef.child("hmReviews").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    int sum = 0;
+                    for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                        int value = ds.getValue(Integer.class);
+                        sum =+ sum + value;
+
+                        String a = String.valueOf(sum);
+                        Toast.makeText(HomestayDetailsActivity.this,"Review Total ::" + a,Toast.LENGTH_SHORT).show();
+                    }
+
+                    final DatabaseReference newRef = databaseRef.child("hmReviews");
+                    newRef.child("Total").setValue(sum);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    throw databaseError.toException();
+                }
+            });*/
+        } catch (Exception e) {
+            Toast.makeText(HomestayDetailsActivity.this, "" + e, Toast.LENGTH_SHORT).show();
+        }
     }
 
     public class BottomNavigationViewBehavior extends CoordinatorLayout.Behavior<BottomNavigationView> {
@@ -478,8 +662,9 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
             .clientId(PayPalConfig.PAYPAL_CLIENT_ID);
 
     private void payPalPayment() {
-        PayPalPayment payment = new PayPalPayment(new BigDecimal(0.10), "MYR", "Homestay Booking",
+        PayPalPayment payment = new PayPalPayment(new BigDecimal(e), "MYR", "Homestay Booking",
                 PayPalPayment.PAYMENT_INTENT_SALE);
+        //price hard code
 
         Intent intent = new Intent(this, PaymentActivity.class);
 
@@ -519,6 +704,7 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
                             payment.put("userEmail", email);
                             payment.put("userContact", phone);
                             payment.put("hmId", hmId);
+                            payment.put("ownerId", PostKey);
                             payment.put("hmName", hmName);
                             payment.put("totalPrice", e);
                             payment.put("bookDate", dateRange);

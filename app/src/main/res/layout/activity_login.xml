@@ -15,14 +15,14 @@
     <RelativeLayout
         android:id="@+id/R1"
         android:layout_width="match_parent"
-        android:layout_height="30sp"
+        android:layout_height="20sp"
         android:layout_weight="1"
         android:background="@color/white">
 
         <ImageView
             android:id="@+id/loginlogo"
             android:layout_width="170dp"
-            android:layout_height="150dp"
+            android:layout_height="170dp"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="30dp"

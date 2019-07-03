@@ -1,14 +1,16 @@
 package com.example.homestaytesting;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -16,6 +18,7 @@ import com.example.homestaytesting.Admin.AdminHomestayStateActivity;
 import com.example.homestaytesting.Admin.AnalysisActivity;
 import com.example.homestaytesting.Admin.OwnerListingActivity;
 import com.example.homestaytesting.HomestayPost.FormActivity;
+import com.example.homestaytesting.HomestayPost.PostHistoryActivity;
 import com.example.homestaytesting.HomestayPost.PostListingActivity;
 import com.example.homestaytesting.Modal.User;
 import com.google.firebase.auth.FirebaseAuth;
@@ -43,6 +46,8 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
     //private ImageView imgView;
     private TextView tvName, tvEmail;
     private EditText editTextName, editTextEmail, editTextContc;
+    private Dialog dialog;
+    private ImageView close;
 
     // Code gambar
     private CircleImageView circleImage;
@@ -84,6 +89,8 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
         findViewById(R.id.L8).setOnClickListener(this);
         findViewById(R.id.L9).setOnClickListener(this);
         findViewById(R.id.L10).setOnClickListener(this);
+        
+        dialog = new Dialog(this);
 
         databaseRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -162,7 +169,7 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.L1:
-                startActivity(new Intent(this, Main2Activity.class));
+                showPopupDialog();
                 break;
             case R.id.L2:
                 startActivity(new Intent(this, PostListingActivity.class));
@@ -171,7 +178,7 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
                 startActivity(new Intent(this, FormActivity.class));
                 break;
             case R.id.L4:
-                startActivity(new Intent(this, Main2Activity.class));
+                startActivity(new Intent(this, PostHistoryActivity.class));
                 break;
             case R.id.L5:
                 startActivity(new Intent(this, Main2Activity.class));
@@ -203,5 +210,20 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
         Intent intent = new Intent(Main2Activity.this, LoginActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    private void showPopupDialog() {
+        dialog.setContentView(R.layout.about_us_popup);
+        close = dialog.findViewById(R.id.close);
+
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.show();
     }
 }

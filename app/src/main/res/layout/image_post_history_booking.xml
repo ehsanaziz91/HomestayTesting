@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="6dp"
+    app:cardCornerRadius="6dp"
+    app:cardElevation="6dp">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dip" >
+
+        <LinearLayout
+            android:id="@+id/thumbnail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="3dip"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="5dip">
+
+            <ImageView
+                android:id="@+id/imgView"
+                android:layout_width="80dip"
+                android:layout_height="60dip"
+                android:src="@drawable/book"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/thumbnail"
+            android:layout_toRightOf="@+id/thumbnail"
+            android:text="Rihanna Love the way lie"
+            android:textColor="#040404"
+            android:typeface="sans"
+            android:textSize="15dip"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tvBookingDate"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvName"
+            android:textColor="#343434"
+            android:textSize="12dip"
+            android:layout_marginTop="1dip"
+            android:layout_marginRight="25dp"
+            android:layout_toRightOf="@+id/thumbnail"
+            android:text="Just gona stand there and ..." />
+
+        <TextView
+            android:id="@+id/tvUserName"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvBookingDate"
+            android:textColor="#343434"
+            android:textSize="12dip"
+            android:layout_marginTop="1dip"
+            android:layout_marginRight="25dp"
+            android:layout_toRightOf="@+id/thumbnail"
+            android:text="Just gona stand there and ..." />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_arrow_right"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"/>
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>
