@@ -1,4 +1,4 @@
-package com.example.homestaytesting.RatReviewActivity.Model;
+package com.example.homestaytesting.Modal;
 
 public class Review {
     private Float ratings;

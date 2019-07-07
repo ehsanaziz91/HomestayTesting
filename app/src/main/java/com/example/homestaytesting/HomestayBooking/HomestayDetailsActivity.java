@@ -19,6 +19,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
 
+import com.example.homestaytesting.HomestayBooking.RatingReview.RatRevActivity;
+import com.example.homestaytesting.HomestayBooking.RatingReview.RatRevDetailsActivity;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import android.support.design.widget.NavigationView;
@@ -120,7 +122,7 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
     private Toolbar mToolbar;
 
     private StorageReference storageRef;
-    private DatabaseReference databaseRef, databaseReference, UserRef, dbRef;
+    private DatabaseReference databaseRef, databaseReference, UserRef, dbRef, notiRef;
 
     private FirebaseAuth hmAuth;
     private FirebaseDatabase firebaseDb;
@@ -128,11 +130,12 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
             hmBathroom, hmBedrooms, hmPropertyType, hmFurnish, hmFacilities, hmFacilities2, hmFacilities3, hmFacilities4, name, phone, email, uid, hmReview;
 
     private ImageView imgView;
-    private TextView tvName, tvName1, tvLocation, tvPrice, tvDetails, tvContact, tvBed, tvBath, tvProperty, tvFurnish, tvAc, tvCa, tvInternet, tvWm, tvTotalPrice, tvReview;
+    private TextView tvName, tvName1, tvLocation, tvPrice, tvDetails, tvContact, tvBed, tvBath, tvProperty, tvFurnish, tvAc, tvCa, tvInternet, tvWm, tvTotalPrice, tvReview, tvMoreReview;
     private EditText edtTextCalendar,edtTextCalendar1, editTextReviews;
     private Button btnPay, btnAvailability, btnBook, btnSubmit;
     private FloatingActionsMenu fabMenu;
     private FloatingActionButton fAB1, fAB2, fAB3;
+    private LinearLayout linearLayout;
 
     private static final int MY_PERMISSIONS_REQUEST_SEND_SMS =0 ;
     String phoneNo = "+60197272594";
@@ -182,23 +185,6 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         btnAvailability = findViewById(R.id.btnAvailability);
         edtTextCalendar = findViewById(R.id.edtTextCalendar);
         edtTextCalendar1 = findViewById(R.id.edtTextCalendar1);
-
-        // ratings and review
-        rating = findViewById(R.id.rating);
-        tvReview = findViewById(R.id.tvReview);
-        ratings = findViewById(R.id.ratings);
-        editTextReviews = findViewById(R.id.editTextReviews);
-        btnSubmit = findViewById(R.id.btnSubmit);
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String totalStars = "Total Stars:: " + ratings.getNumStars();
-                String rating = "Rating :: " + ratings.getRating();
-                String review = "Review :: " + editTextReviews.getText();
-                //Toast.makeText(getApplicationContext(), totalStars + "\n" + rating + "\n" + review, Toast.LENGTH_LONG).show();
-                ratingreviewsubmit();
-            }
-        });
 
         fabMenu = findViewById(R.id.fab);
         fAB1 = findViewById(R.id.fab1);
@@ -272,6 +258,7 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         databaseRef = FirebaseDatabase.getInstance().getReference().child("Uploads").child(PostKey);
         databaseReference = FirebaseDatabase.getInstance().getReference("Booking");
         dbRef = FirebaseDatabase.getInstance().getReference("Ratings&Reviews");
+        notiRef = FirebaseDatabase.getInstance().getReference("Notifications");
 
         databaseRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -433,6 +420,43 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         //change button availability to book pyament if date and price are set
         onButtonChanged();
 
+        // ratings and review
+        rating = findViewById(R.id.rating);
+        tvReview = findViewById(R.id.tvReview);
+/*        ratings = findViewById(R.id.ratings);
+        editTextReviews = findViewById(R.id.editTextReviews);
+        btnSubmit = findViewById(R.id.btnSubmit);
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String totalStars = "Total Stars:: " + ratings.getNumStars();
+                String rating = "Rating :: " + ratings.getRating();
+                String review = "Review :: " + editTextReviews.getText();
+                //Toast.makeText(getApplicationContext(), totalStars + "\n" + rating + "\n" + review, Toast.LENGTH_LONG).show();
+                ratingreviewsubmit();
+            }
+        });*/
+
+        tvMoreReview = findViewById(R.id.tvMoreReview);
+        tvMoreReview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent click_post = new Intent(HomestayDetailsActivity.this, RatRevDetailsActivity.class);
+                click_post.putExtra("PostKey", PostKey);
+                startActivity(click_post);
+            }
+        });
+
+        linearLayout = findViewById(R.id.tvRRLink);
+        linearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent click_post = new Intent(HomestayDetailsActivity.this, RatRevActivity.class);
+                click_post.putExtra("PostKey", PostKey);
+                startActivity(click_post);
+            }
+        });
+
         //retrieve the rating and review
         databaseRef.child("hmRatings").child(currentUserid).addValueEventListener(new ValueEventListener() {
             @Override
@@ -485,7 +509,7 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         });*/
     }
 
-    private void ratingreviewsubmit() {
+/*    private void ratingreviewsubmit() {
         Float rat = ratings.getRating();
         String review = editTextReviews.getText().toString();
         ratingreviewsubmits(rat, review);
@@ -570,7 +594,7 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
                 }
             });
 
-/*            databaseRef.child("hmReviews").addValueEventListener(new ValueEventListener() {
+*//*            databaseRef.child("hmReviews").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     int sum = 0;
@@ -590,11 +614,11 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
                 public void onCancelled(DatabaseError databaseError) {
                     throw databaseError.toException();
                 }
-            });*/
+            });*//*
         } catch (Exception e) {
             Toast.makeText(HomestayDetailsActivity.this, "" + e, Toast.LENGTH_SHORT).show();
         }
-    }
+    }*/
 
     public class BottomNavigationViewBehavior extends CoordinatorLayout.Behavior<BottomNavigationView> {
 
@@ -744,6 +768,22 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
 
                             //Display the message!
                             diag.show();
+
+                            //send notification to owner
+                            HashMap<String, String> alertnotification = new HashMap<>();
+                            alertnotification.put("from", currentUserid);
+                            alertnotification.put("type", "request");
+
+                            notiRef.child(PostKey).push()
+                                    .setValue(alertnotification)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()){
+                                                Toast.makeText(getApplicationContext(), "Notification Send", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
                         }
                     }catch (JSONException e){
                         e.printStackTrace();

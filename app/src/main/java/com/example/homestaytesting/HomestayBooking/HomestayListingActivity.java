@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.example.homestaytesting.HomestayPost.PostListingActivity;
@@ -23,9 +24,12 @@ import com.example.homestaytesting.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 public class HomestayListingActivity extends AppCompatActivity {
@@ -38,6 +42,8 @@ public class HomestayListingActivity extends AppCompatActivity {
     private String currentUserid;
 
     private Toolbar mToolbar;
+
+    private RatingBar rating;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +76,8 @@ public class HomestayListingActivity extends AppCompatActivity {
                 HomestayListingActivity.this.startActivity(intent);
             }
         });
+
+        rating = findViewById(R.id.rating);
     }
 
     @Override
@@ -154,6 +162,7 @@ public class HomestayListingActivity extends AppCompatActivity {
     {
         TextView hmName, hmDetails, hmLocation, hmPrice, hmContact, hmPropertyType, hmFurnish;
         ImageView hmImage;
+        RatingBar hmRatings;
 
 
         public PostsViewHolder(View itemView)
@@ -168,6 +177,7 @@ public class HomestayListingActivity extends AppCompatActivity {
             hmPrice = itemView.findViewById(R.id.tvPrice);
             //hmContact = itemView.findViewById(R.id.tvContact);
             hmImage = itemView.findViewById(R.id.imgView);
+            hmRatings = itemView.findViewById(R.id.rating);
 
         }
     }

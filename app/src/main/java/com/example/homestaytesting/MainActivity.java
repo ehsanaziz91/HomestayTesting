@@ -35,6 +35,7 @@ import android.widget.TextView;
 
 import com.example.homestaytesting.HomestayBooking.HomestayDetailsActivity;
 import com.example.homestaytesting.HomestayBooking.HomestayListingActivity;
+import com.example.homestaytesting.HomestayBooking.Notification.NotificationActivity;
 import com.example.homestaytesting.HomestayPost.FormActivity;
 import com.example.homestaytesting.HomestayPost.PostDetailsActivity;
 import com.example.homestaytesting.HomestayPost.PostListingActivity;
@@ -292,9 +293,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             finish();*/
 
         } else if (id == R.id.nav_history) {
-/*            Intent intent = new Intent(MainActivity.this, BottomNavigationActivity.class);
+            Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
             startActivity(intent);
-            finish();*/
+            finish();
 
         }else if (id == R.id.nav_aboutus) {
 

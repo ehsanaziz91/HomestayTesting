@@ -37,6 +37,7 @@ dependencies {
     //implementation 'com.firebase:geofire-android:2.3.1'
     implementation 'com.google.firebase:firebase-auth:16.1.0'
     implementation 'com.google.firebase:firebase-messaging:17.3.4'
+    //implementation 'com.google.firebase:firebase-messaging:17.0.0'
     //implementation 'com.google.firebase:firebase-messaging:17.3.2'
     implementation 'com.google.firebase:firebase-storage:16.0.1'
     implementation 'com.google.firebase:firebase-database:16.0.1'
@@ -74,3 +75,7 @@ dependencies {
     implementation 'hyogeun.github.com.colorratingbar:ColorRatingBar:1.0.1'
     //implementation 'com.stepstone.apprating:app-rating:2.0.0'
 }
+
+
+// Work around
+//com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true
