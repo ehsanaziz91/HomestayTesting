@@ -32,13 +32,20 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:16.0.0'
     implementation 'com.google.android.gms:play-services-places:16.0.0'
     implementation 'com.google.android.libraries.places:places:1.0.0'
+    implementation 'com.github.karanchuri:PermissionManager:0.1.0'
     //view nearby location with range in maps
     implementation 'com.google.maps.android:android-maps-utils:0.5+'
     //implementation 'com.firebase:geofire-android:2.3.1'
     implementation 'com.google.firebase:firebase-auth:16.1.0'
     implementation 'com.google.firebase:firebase-messaging:17.3.4'
-    //implementation 'com.google.firebase:firebase-messaging:17.0.0'
+    //implementation 'com.google.firebase:firebase-messaging:19.0.1'
+    //implementation 'com.google.firebase:firebase-messaging:18.0.0'
+    //implementation 'com.google.firebase:firebase-messaging:17.6.0'
+    //implementation 'com.google.firebase:firebase-messaging:17.5.0'
+    //implementation 'com.google.firebase:firebase-messaging:17.4.0'
+    //implementation 'com.google.firebase:firebase-messaging:17.3.3'
     //implementation 'com.google.firebase:firebase-messaging:17.3.2'
+    //implementation 'com.google.firebase:firebase-messaging:17.0.0'
     implementation 'com.google.firebase:firebase-storage:16.0.1'
     implementation 'com.google.firebase:firebase-database:16.0.1'
     implementation 'com.google.firebase:firebase-core:16.0.1'
@@ -68,6 +75,7 @@ dependencies {
     implementation 'com.github.franmontiel:FullScreenDialog:1.0.1'
     implementation 'com.ms-square:expandableTextView:0.1.4'
     implementation 'com.alespero:expandable-cardview:0.8'
+    implementation 'com.bignerdranch.android:expandablerecyclerview:1.0.3'
     //using for analysis and report
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
@@ -76,6 +84,6 @@ dependencies {
     //implementation 'com.stepstone.apprating:app-rating:2.0.0'
 }
 
-
 // Work around
 //com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true
+

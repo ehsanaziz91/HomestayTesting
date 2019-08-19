@@ -32,9 +32,11 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.homestaytesting.HomestayBooking.HomestayDetailsActivity;
 import com.example.homestaytesting.HomestayBooking.HomestayListingActivity;
+import com.example.homestaytesting.HomestayBooking.MyBooking.MyBookingActivity;
 import com.example.homestaytesting.HomestayBooking.Notification.NotificationActivity;
 import com.example.homestaytesting.HomestayPost.FormActivity;
 import com.example.homestaytesting.HomestayPost.PostDetailsActivity;
@@ -65,9 +67,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.karan.churi.PermissionManager.PermissionManager;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
@@ -86,6 +91,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     GoogleApiClient googleApiClient;
     Location lastLocation;
     LocationRequest locationRequest;
+    PermissionManager permissionManager;
+
+    double currLatitude, currLongitude;
+    double endLatitude, endLongitude;
 
     private ChildEventListener mChildEventListener;
     private DatabaseReference databaseRef;
@@ -108,6 +117,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        permissionManager=new PermissionManager() {};
+        permissionManager.checkAndRequestPermissions(this);
 
         hmAuth = FirebaseAuth.getInstance();
         currentUserid = hmAuth.getCurrentUser().getUid();
@@ -234,6 +246,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    //request app permission
+    @Override
+    public void onRequestPermissionsResult(int requestCode,String permissions[], int[] grantResults) {
+        permissionManager.checkResult(requestCode,permissions, grantResults);
+    }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -283,14 +301,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             finish();
 
         } else if (id == R.id.nav_booking) {
-/*            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            Intent intent = new Intent(MainActivity.this, MyBookingActivity.class);
             startActivity(intent);
-            finish();*/
+            finish();
 
         } else if (id == R.id.nav_favourite) {
-/*            Intent intent = new Intent(MainActivity.this, FormActivity.class);
+            Intent intent = new Intent(MainActivity.this, Error808Activity.class);
             startActivity(intent);
-            finish();*/
+            finish();
 
         } else if (id == R.id.nav_history) {
             Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
@@ -298,6 +316,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             finish();
 
         }else if (id == R.id.nav_aboutus) {
+            Intent intent = new Intent(MainActivity.this, AboutUsActivity.class);
+            startActivity(intent);
+            finish();
 
 /*            Intent intent = new Intent(MainActivity.this, ToolbarTestingActivity.class);
             startActivity(intent);
@@ -314,7 +335,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         }else if (id == R.id.nav_logout) {
             logout();
-
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -332,7 +352,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         startActivity(intent);
         finish();
     }
-
+    DataSnapshot eachHomestay ;
     @Override
     public void onLocationChanged(Location location) {
         lastLocation = location;
@@ -348,6 +368,51 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
+        //calculate distance and update map
+
+        final MarkerOptions markerOptions = new MarkerOptions();
+        float[] results = new float[(int)eachHomestay.getChildrenCount()];
+        for(DataSnapshot eachData : eachHomestay.getChildren())
+        {
+            final Upload upload = eachData.getValue(Upload.class);
+            Double dblLang = eachData.child("lang").getValue(Double.class) ;
+            Double dblLat = eachData.child("lat").getValue(Double.class) ;
+            Location tempLoc = new Location("temp");
+            tempLoc.setLatitude(dblLat);
+            tempLoc.setLongitude(dblLang);
+            //Location.distanceBetween(location.getLatitude(),location.getLongitude(),dblLang,dblLat,results);
+            float distance = tempLoc.distanceTo(location); //distance in miles
+            float a = (float) (distance * 0.001); //convert miles to km
+            DecimalFormat dcFormat = new DecimalFormat("0.0"); //decimal format to two decimal point
+            int speed = 80;
+            float time = a / speed;
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+            float h = time / (60 * 60 * 1000) % 24;
+            float m = time / (60 * 1000) % 60;
+            if (a < 10)
+            {
+                LatLng dbLoc = new LatLng(dblLat, dblLang);
+                markerOptions.position(dbLoc);
+                markerOptions.title(upload.getHmName());
+                markerOptions.snippet("RM " + upload.getHmPrice()+"\n"+ dcFormat.format(a) + " km" + "\n");
+                markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.homestay));
+
+                marker = mMap.addMarker(markerOptions);
+            }
+            String strDebug = "";
+        }
+       /* DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("Uploads");
+        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });*/
         //editLocation.setText("");
         //pb.setVisibility(View.INVISIBLE);
 /*        Toast.makeText(getBaseContext(), "Location changed : Lat: " + location.getLatitude() + " Lng: " + location.getLongitude(), Toast.LENGTH_SHORT).show();
@@ -409,12 +474,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap = googleMap;
         googleMap.setOnMarkerClickListener(this);
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        googleMap.getUiSettings().setZoomControlsEnabled(true);
 
         buildGoogleApiClient();
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         mMap.setMyLocationEnabled(true);
+
 
         DatabaseReference UsersRef = FirebaseDatabase.getInstance().getReference();
         final DatabaseReference Postsref = UsersRef.child("Uploads");
@@ -424,14 +491,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 final MarkerOptions markerOptions = new MarkerOptions();
 
-
+                eachHomestay = dataSnapshot;
                 for(final DataSnapshot s : dataSnapshot.getChildren())
                 {
                     final Upload upload = s.getValue(Upload.class);
                     double latitude = upload.getLat();
                     double longitude = upload.getLang();
 
-                    //Geocoder geocoder;
+/*                    LatLng location = new LatLng(upload.getLat(),upload.getLang());
+                    markerOptions.position(location);
+                    markerOptions.title(upload.getHmName());
+                    markerOptions.snippet("RM " + upload.getHmPrice()+"\n"+"1 h 52 m"+"\n"+"1 KM");
+                    //markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+                    markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.homestay));
+
+                    marker = mMap.addMarker(markerOptions);*/
+
+/*                    //Geocoder geocoder;
 
                     //geocoder = new Geocoder(this, Locale.getDefault());
                     Geocoder gcd = new Geocoder(getBaseContext(), Locale.getDefault());
@@ -463,7 +539,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
-                    }
+                    }*/
 
 /*                    String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
                     String city = addresses.get(0).getLocality();
@@ -471,14 +547,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     String country = addresses.get(0).getCountryName();
                     String postalCode = addresses.get(0).getPostalCode();
                     String knownName = addresses.get(0).getFeatureName(); // Only if available else return NULL*/
-
-/*                    LatLng location = new LatLng(upload.getLat(),upload.getLang());
-                    markerOptions.position(location);
-                    markerOptions.title(upload.getHmName());
-                    markerOptions.snippet("RM " + upload.getHmPrice()+"\n"+"1 h 52 m"+"\n"+"1 KM");
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-
-                    marker = mMap.addMarker(markerOptions);*/
 
 /*                    String b = location.toString();
 
@@ -580,14 +648,44 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        locationRequest = new LocationRequest();
-/*        locationRequest.setInterval(1000);
-        locationRequest.setFastestInterval(1000);*/
+        /*locationRequest = new LocationRequest();
+*//*        locationRequest.setInterval(1000);
+        locationRequest.setFastestInterval(1000);*//*
         locationRequest.setPriority(locationRequest.PRIORITY_HIGH_ACCURACY);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
+            //LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+        }*/
+        //LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+
+        // Permissions ok, we get last location
+        lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+
+        if (lastLocation != null) {
+
+            //locationTv.setText("Latitude : " + location.getLatitude() + "\nLongitude : " + location.getLongitude());
+            //Toast.makeText(getBaseContext(), "Location changed onConnected : Lat: " + lastLocation.getLatitude() + " Lng: " + lastLocation.getLongitude(), Toast.LENGTH_LONG).show();
+            String longitude = "Longitude: " + lastLocation.getLongitude();
+            Log.v(TAG, longitude);
+            String latitude = "Latitude: " + lastLocation.getLatitude();
+            Log.v(TAG, latitude);
         }
+
+        startLocationUpdates();
+    }
+
+    private void startLocationUpdates() {
+        locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                &&  ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "You need to enable permissions to display location !", Toast.LENGTH_SHORT).show();
+        }
+
         LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
     }
 

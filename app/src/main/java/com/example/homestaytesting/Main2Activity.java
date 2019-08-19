@@ -31,6 +31,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.karan.churi.PermissionManager.PermissionManager;
 import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -54,10 +55,15 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
     final static int gallerypick = 1;
     private StorageReference UserProfileImageRef;
 
+    PermissionManager permissionManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+
+        permissionManager=new PermissionManager() {};
+        permissionManager.checkAndRequestPermissions(this);
 
         hmAuth = FirebaseAuth.getInstance();
         currentUserid = hmAuth.getCurrentUser().getUid();
@@ -120,6 +126,12 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
 
             }
         });
+    }
+
+    //request app permission
+    @Override
+    public void onRequestPermissionsResult(int requestCode,String permissions[], int[] grantResults) {
+        permissionManager.checkResult(requestCode,permissions, grantResults);
     }
 
     public void DetermineRole(){

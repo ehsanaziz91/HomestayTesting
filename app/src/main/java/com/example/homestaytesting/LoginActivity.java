@@ -26,6 +26,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.FirebaseMessagingService;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -41,11 +43,25 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private RelativeLayout R1,R2;
     private Animation uptodown,downtoup;
+    String tokenPerAndroidDevice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        //guest / xiaomi token
+        //dfa_TJtpOqM:APA91bH51FUTu8BpTYYytiKjSDLzxxPaQnRquQaQZ0f-vgvPC_ZEzQgYv3u5MsvOw32Sp3ursZHV1zaZsua5KWYCA9dD8ac-ZxYckvz2OvKgAlpkQaXji0VhTWchGTy4F8W0EJmeEoGf
+
+        //owner / lenovo token
+        //de1IaLw6YTg:APA91bEEiU4YdyVsJG9n3NCKmTcWrhJALTO-_ErLWuR-ywm1RMQgOgCi71SylhJxrz9PjZXK8NWOUpGUstTN8pocvetztxpw0aokveoj0uOQnjVFGCP39nbSK_uDtPt7gA_r0mgfNQqN
+/*        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+            @Override
+            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+              tokenPerAndroidDevice = task.getResult().getToken();
+              String strDebug = "";
+            }
+        });*/
 
         hmAuth = FirebaseAuth.getInstance();
         UserRef = FirebaseDatabase.getInstance().getReference().child("Users");
@@ -145,7 +161,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         final String deviceToken = FirebaseInstanceId.getInstance().getToken();
 
         //replace noti when tukar device
-        //UserRef.child(uid).child("devicetoken").setValue(deviceToken);
+        UserRef.child(uid).child("devicetoken").setValue(deviceToken);
 
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference xx = db.getReference();
@@ -207,4 +223,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
 
     }
+
+
 }

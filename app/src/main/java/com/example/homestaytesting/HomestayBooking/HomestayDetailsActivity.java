@@ -260,6 +260,12 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         dbRef = FirebaseDatabase.getInstance().getReference("Ratings&Reviews");
         notiRef = FirebaseDatabase.getInstance().getReference("Notifications");
 
+        UserRef.goOffline();
+        databaseRef.goOffline();
+        databaseReference.goOffline();
+        dbRef.goOffline();
+        notiRef.goOffline();
+
         databaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange (@NonNull DataSnapshot dataSnapshot)
@@ -458,12 +464,17 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         });
 
         //retrieve the rating and review
-        databaseRef.child("hmRatings").child(currentUserid).addValueEventListener(new ValueEventListener() {
+        databaseRef.child("hmRatings").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot != null && dataSnapshot.getValue() != null) {
-                    float ratings = Float.parseFloat(dataSnapshot.getValue().toString());
-                    rating.setRating(ratings);
+                    for (final DataSnapshot s : dataSnapshot.getChildren()) {
+                        float ratings = Float.parseFloat(s.getValue().toString());
+                        rating.setRating(ratings);
+                    }
+                }
+                else {
+                    rating.setVisibility(View.GONE);
                 }
             }
 
@@ -476,8 +487,15 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
         databaseRef.child("hmReviews").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                hmReview = dataSnapshot.child(currentUserid).getValue().toString();
-                tvReview.setText(hmReview);
+                if (dataSnapshot != null && dataSnapshot.getValue() != null) {
+                    for(final DataSnapshot s : dataSnapshot.getChildren()) {
+                        hmReview = s.getValue().toString();
+                        tvReview.setText(hmReview);
+                    }
+                }
+                else {
+                    tvReview.setVisibility(View.GONE);
+                }
             }
 
             @Override
@@ -686,9 +704,9 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
             .clientId(PayPalConfig.PAYPAL_CLIENT_ID);
 
     private void payPalPayment() {
-        PayPalPayment payment = new PayPalPayment(new BigDecimal(e), "MYR", "Homestay Booking",
+        PayPalPayment payment = new PayPalPayment(new BigDecimal(.10), "MYR", "Homestay Booking",
                 PayPalPayment.PAYMENT_INTENT_SALE);
-        //price hard code
+        //price hard code e
 
         Intent intent = new Intent(this, PaymentActivity.class);
 
@@ -738,43 +756,12 @@ public class HomestayDetailsActivity extends AppCompatActivity implements OnMapR
 
                             //Toast.makeText(getApplicationContext(), "Payment Successful", Toast.LENGTH_LONG).show();
 
-                            /*AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                            builder.setMessage("Payment Successful ! Close...")
-                                    .setCancelable(false)
-                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            finish();
-                                        }
-                                    })
-                                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.cancel();
-                                        }
-                                    });
-                            AlertDialog alertDialog = builder.create();
-                            alertDialog.setTitle("Alert !!!");
-                            alertDialog.show();*/
-
-                            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-                            builder.setTitle("AlertDialog with No Buttons");
-
-                            builder.setMessage("Hello, you can hide this message by just tapping anywhere outside the dialog box!");
-
-
-                            AlertDialog diag = builder.create();
-
-                            //Display the message!
-                            diag.show();
-
                             //send notification to owner
                             HashMap<String, String> alertnotification = new HashMap<>();
                             alertnotification.put("from", currentUserid);
                             alertnotification.put("type", "request");
 
-                            notiRef.child(PostKey).push()
+                            notiRef.child("241XoIOo9sYJym8kfoZnXUCGD1s2").push()
                                     .setValue(alertnotification)
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override

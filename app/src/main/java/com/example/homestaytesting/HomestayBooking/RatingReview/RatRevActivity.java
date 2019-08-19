@@ -24,6 +24,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 
 public class RatRevActivity extends AppCompatActivity {
@@ -31,7 +33,7 @@ public class RatRevActivity extends AppCompatActivity {
     private Toolbar mToolbar;
 
     private StorageReference storageRef;
-    private DatabaseReference databaseRef, databaseReference, UserRef, dbRef;
+    private DatabaseReference databaseRef, databaseReference, UserRef, dbRef, dbRefrence;
 
     private FirebaseAuth hmAuth;
     private FirebaseDatabase firebaseDb;
@@ -60,6 +62,7 @@ public class RatRevActivity extends AppCompatActivity {
         PostKey = getIntent().getExtras().get("PostKey").toString();
         UserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserid);
         databaseRef = FirebaseDatabase.getInstance().getReference().child("Uploads").child(PostKey);
+        dbRefrence = FirebaseDatabase.getInstance().getReference().child("Uploads").child(PostKey).child("hmRatings");
         dbRef = FirebaseDatabase.getInstance().getReference("Ratings&Reviews");
 
         databaseRef.addValueEventListener(new ValueEventListener() {
@@ -95,16 +98,46 @@ public class RatRevActivity extends AppCompatActivity {
         ratingreviewsubmits(rat, review);
     }
 
-    private void ratingreviewsubmits(Float rat, String review) {
-        rat = ratings.getRating();
+    private void ratingreviewsubmits(Float rats, String review) {
+        rats = ratings.getRating();
         review = editTextReviews.getText().toString();
 
+        final Float finalRats = rats;
+        final String finalReview = review;
+
         HashMap ratreview = new HashMap();
-        ratreview.put("rating", rat);
-        ratreview.put("review", review);
-        ratreview.put("hmID", hmId);
+        ratreview.put("hmRatings", rats);
+        ratreview.put("hmReviews", review);
+        ratreview.put("hmPostKey", PostKey);
+        ratreview.put("uID", currentUserid);
 
-        dbRef.child(currentUserid).setValue(ratreview).addOnCompleteListener(new OnCompleteListener() {
+        Calendar calFordDate = Calendar.getInstance();
+        SimpleDateFormat currentDate = new SimpleDateFormat("dd-MMMM-yyyy");
+        String saveCurrentDate = currentDate.format(calFordDate.getTime());
+
+        Calendar calFordTime = Calendar.getInstance();
+        SimpleDateFormat currentTime = new SimpleDateFormat("HH:mm:ss");
+        String saveCurrentTime = currentTime.format(calFordTime.getTime());
+
+        String postRandomName = saveCurrentDate + saveCurrentTime;
+
+        dbRef.child(PostKey).child(currentUserid).setValue(ratreview).addOnCompleteListener(new OnCompleteListener() {
+            @Override
+            public void onComplete(@NonNull Task task) {
+                if(task.isSuccessful()){
+                    databaseRef.child("hmRatings").child(currentUserid).setValue(finalRats);
+                    databaseRef.child("hmReviews").child(currentUserid).setValue(finalReview);
+                    if(task.isSuccessful()){
+                        submitRating();
+                    }
+                }
+                else{
+                    Toast.makeText(RatRevActivity.this, "An error on insert your feedback, please try again!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+/*        databaseRef.child("hmRatings").child(currentUserid).setValue(rats).addOnCompleteListener(new OnCompleteListener() {
             @Override
             public void onComplete(@NonNull Task task) {
                 if(task.isSuccessful()){
@@ -115,22 +148,9 @@ public class RatRevActivity extends AppCompatActivity {
                     Toast.makeText(RatRevActivity.this, "An error on insert your feedback, please try again!", Toast.LENGTH_SHORT).show();
                 }
             }
-        });
+        });*/
 
-        databaseRef.child("hmRatings").child(currentUserid).setValue(rat).addOnCompleteListener(new OnCompleteListener() {
-            @Override
-            public void onComplete(@NonNull Task task) {
-                if(task.isSuccessful()){
-                    Toast.makeText(RatRevActivity.this, "Successfully send your feedback",Toast.LENGTH_SHORT).show();
-                    //submitRating();
-                }
-                else{
-                    Toast.makeText(RatRevActivity.this, "An error on insert your feedback, please try again!", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        databaseRef.child("hmReviews").child(currentUserid).setValue(review).addOnCompleteListener(new OnCompleteListener() {
+/*        databaseRef.child("hmReviews").child(currentUserid).setValue(review).addOnCompleteListener(new OnCompleteListener() {
             @Override
             public void onComplete(@NonNull Task task) {
                 if(task.isSuccessful()){
@@ -141,7 +161,7 @@ public class RatRevActivity extends AppCompatActivity {
                     Toast.makeText(RatRevActivity.this, "An error on insert your feedback, please try again!", Toast.LENGTH_SHORT).show();
                 }
             }
-        });
+        });*/
     }
 
     public void submitRating() {
@@ -150,12 +170,12 @@ public class RatRevActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
-                    double total = 0.0;
-                    double count = 0.0;
-                    double average = 0.0;
+                    float total = 0;
+                    float count = 0;
+                    float average = 0;
 
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                        double rating = ds.getValue(Double.class);
+                        float rating = ds.getValue(Float.class);
                         total = total + rating;
                         count = count + 1;
                         average = total / count;
@@ -165,7 +185,9 @@ public class RatRevActivity extends AppCompatActivity {
                     }
 
                     final DatabaseReference newRef = databaseRef.child("hmRatings");
-                    newRef.child("Average").setValue(average);
+                    newRef.child("hmAverageRat").setValue(average);
+                    databaseRef.child("hmAverageRat").setValue(average);
+                    dbRef.child("hmAverageRat").setValue(average);
                 }
 
                 @Override

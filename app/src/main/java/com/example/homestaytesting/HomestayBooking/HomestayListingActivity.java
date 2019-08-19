@@ -15,11 +15,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.homestaytesting.HomestayPost.PostListingActivity;
 import com.example.homestaytesting.HomestayPost.PostUpdateActivity;
 import com.example.homestaytesting.MainActivity;
+import com.example.homestaytesting.Modal.Review;
 import com.example.homestaytesting.Modal.Upload;
+import com.example.homestaytesting.Modal.User;
 import com.example.homestaytesting.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -36,10 +39,11 @@ public class HomestayListingActivity extends AppCompatActivity {
 
     private RecyclerView postList;
 
-    private DatabaseReference UsersRef,Postsref,LikesRef;
+    private DatabaseReference UsersRef,UsersRefs,Postsref,LikesRef, RatingRef;
 
     private FirebaseAuth hmAuth;
     private String currentUserid;
+    private TextView tvAverage;
 
     private Toolbar mToolbar;
 
@@ -66,7 +70,9 @@ public class HomestayListingActivity extends AppCompatActivity {
         currentUserid = hmAuth.getCurrentUser().getUid();
 
         UsersRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserid);
+        UsersRefs = FirebaseDatabase.getInstance().getReference().child("Users");
         Postsref = FirebaseDatabase.getInstance().getReference().child("Uploads");
+        RatingRef = FirebaseDatabase.getInstance().getReference().child("Ratings&Reviews").child("hmAverageRat");
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -109,9 +115,8 @@ public class HomestayListingActivity extends AppCompatActivity {
         FirebaseRecyclerAdapter<Upload,HomestayListingActivity.PostsViewHolder> adapter = new FirebaseRecyclerAdapter<Upload, HomestayListingActivity.PostsViewHolder>(options)
         {
             @Override
-            protected void onBindViewHolder(@NonNull HomestayListingActivity.PostsViewHolder holder, final int position, @NonNull Upload model)
+            protected void onBindViewHolder(@NonNull final HomestayListingActivity.PostsViewHolder holder, final int position, @NonNull Upload model)
             {
-
                 final String PostKey = getRef(position).getKey();
 
                 holder.hmName.setText(model.getHmName());
@@ -128,6 +133,23 @@ public class HomestayListingActivity extends AppCompatActivity {
                         .centerCrop()
                         .into(holder.hmImage);
 
+                Postsref.child(PostKey).child("hmAverageRat").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.getValue() != null){
+                            float ratings = Float.valueOf(dataSnapshot.getValue().toString());
+                            holder.hmAverageRat.setRating(ratings);
+                        } else {
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view)
@@ -140,6 +162,7 @@ public class HomestayListingActivity extends AppCompatActivity {
                         startActivity(click_post);
                     }
                 });
+
 
             }
 
@@ -160,9 +183,9 @@ public class HomestayListingActivity extends AppCompatActivity {
 
     public static class PostsViewHolder extends RecyclerView.ViewHolder
     {
-        TextView hmName, hmDetails, hmLocation, hmPrice, hmContact, hmPropertyType, hmFurnish;
+        TextView hmName, hmLocation, hmPrice, hmPropertyType, hmFurnish;
         ImageView hmImage;
-        RatingBar hmRatings;
+        RatingBar hmAverageRat;
 
 
         public PostsViewHolder(View itemView)
@@ -172,13 +195,10 @@ public class HomestayListingActivity extends AppCompatActivity {
             hmFurnish = itemView.findViewById(R.id.tvFurnish);
             hmPropertyType = itemView.findViewById(R.id.tvProperty);
             hmName = itemView.findViewById(R.id.tvName);
-            //hmDetails = itemView.findViewById(R.id.tvDetails);
             hmLocation = itemView.findViewById(R.id.tvLocation);
             hmPrice = itemView.findViewById(R.id.tvPrice);
-            //hmContact = itemView.findViewById(R.id.tvContact);
             hmImage = itemView.findViewById(R.id.imgView);
-            hmRatings = itemView.findViewById(R.id.rating);
-
+            hmAverageRat = itemView.findViewById(R.id.rating);
         }
     }
 }

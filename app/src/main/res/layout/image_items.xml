@@ -93,8 +93,8 @@
             android:transformPivotX="30dp"
             android:transformPivotY="0dp"
             app:changeable="false"
-            app:empty_color="#75C9E2"
-            app:progress_color="#3C99AA" />
+            app:empty_color="#95E1EF"
+            app:progress_color="#116384" />
 
     </LinearLayout>
 

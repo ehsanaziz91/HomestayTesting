@@ -1,30 +1,40 @@
 package com.example.homestaytesting.Modal;
 
 public class Review {
-    private Float ratings;
-    private String reviews;
+    private Float hmAverageRat;
+    private Float hmRatings;
+    private String hmReviews;
 
     public Review (){
     }
 
-    public Review(Float ratings, String reviews) {
-        this.ratings = ratings;
-        this.reviews = reviews;
+    public Review(Float hmAverageRat, Float hmRatings, String hmReviews) {
+        this.hmAverageRat = hmAverageRat;
+        this.hmRatings = hmRatings;
+        this.hmReviews = hmReviews;
     }
 
-    public Float getRatings() {
-        return ratings;
+    public Float getHmAverageRat() {
+        return hmAverageRat;
     }
 
-    public void setRatings(Float ratings) {
-        this.ratings = ratings;
+    public void setHmAverageRat(Float hmAverageRat) {
+        this.hmAverageRat = hmAverageRat;
     }
 
-    public String getReviews() {
-        return reviews;
+    public Float getHmRatings() {
+        return hmRatings;
     }
 
-    public void setReviews(String reviews) {
-        this.reviews = reviews;
+    public void setHmRatings(Float hmRatings) {
+        this.hmRatings = hmRatings;
+    }
+
+    public String getHmReviews() {
+        return hmReviews;
+    }
+
+    public void setHmReviews(String hmReviews) {
+        this.hmReviews = hmReviews;
     }
 }
